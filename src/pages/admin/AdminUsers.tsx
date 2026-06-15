@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Users, Loader, X, FileText, Smartphone, Key, MapPin } from 'lucide-react';
+import { Users, Loader, FileText, Smartphone, Key, MapPin } from 'lucide-react';
 import { listUsers } from '../../utils/admin-api';
 import '../../assets/admin.css';
 

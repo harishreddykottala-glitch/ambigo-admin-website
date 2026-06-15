@@ -76,7 +76,7 @@ export default function AdminRealMap() {
     return index >= 0 ? COLORS[index % COLORS.length] : '#64748b'; // Slate color fallback
   };
 
-  const center: [number, number] = [14.6819, 77.6006];
+
   
   const validDrivers = drivers.filter(d => d.location && d.location.coordinates && d.location.coordinates.length >= 2);
 

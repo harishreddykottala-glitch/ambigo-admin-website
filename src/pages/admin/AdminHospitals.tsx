@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Building2, Loader, MapPin, Clock, List } from 'lucide-react';
+import { Building2, Loader, MapPin, Clock } from 'lucide-react';
 import { listHospitals } from '../../utils/admin-api';
 import '../../assets/admin.css';
 
