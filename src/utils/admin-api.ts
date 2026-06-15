@@ -24,7 +24,7 @@ export function getHeaders() {
 }
 
 export async function sendAdminOTP(mobile: string) {
-  const res = await fetch(`${BASE_URL}/admin/login/mobile`, {
+  const res = await fetch(`${BASE_URL}/admin/auth/login/mobile`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json', 'X-API-Key': 'fnw4ua8bdueu5vckkhg56jaq8xy9m8' },
     body: JSON.stringify({ mobile })
@@ -37,7 +37,7 @@ export async function sendAdminOTP(mobile: string) {
 }
 
 export async function verifyAdminOTP(mobile: string, otp: string) {
-  const res = await fetch(`${BASE_URL}/admin/login/mobile/verify`, {
+  const res = await fetch(`${BASE_URL}/admin/auth/login/mobile/verify`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json', 'X-API-Key': 'fnw4ua8bdueu5vckkhg56jaq8xy9m8' },
     body: JSON.stringify({ mobile, otp })
