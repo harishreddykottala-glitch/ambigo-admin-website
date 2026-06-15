@@ -1,6 +1,6 @@
 // Mock API Data for demonstration purposes
 
-const BASE_URL = import.meta.env.VITE_API_URL || 'https://ambigo.in/api';
+const BASE_URL = import.meta.env.VITE_API_URL || '/api';
 const WS_URL = import.meta.env.VITE_WS_URL || 'wss://ambigo.in/ws';
 export const LIVE_MEDIA_URL = import.meta.env.VITE_MEDIA_URL || 'https://ambigo.in';
 
