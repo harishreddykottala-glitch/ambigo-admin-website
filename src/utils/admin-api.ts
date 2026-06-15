@@ -23,25 +23,30 @@ export function getHeaders() {
   };
 }
 
-export async function loginEmail(email: string, password: string) {
-  // Always allow the default super admin
-  if (email === 'admin@ambigo.com' && password === 'admin123') {
-    return { token: 'mock-admin-token-123' };
+export async function sendAdminOTP(mobile: string) {
+  const res = await fetch(`${BASE_URL}/admin/login/mobile`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', 'X-API-Key': 'fnw4ua8bdueu5vckkhg56jaq8xy9m8' },
+    body: JSON.stringify({ mobile })
+  });
+  if (!res.ok) {
+    const error = await res.json();
+    throw new Error(error.detail || 'Failed to send OTP');
   }
+  return await res.json();
+}
 
-  // Check dynamically added co-admins in localStorage
-  const savedAdmins = localStorage.getItem('ambigo_coadmins');
-  if (savedAdmins) {
-    const coAdmins = JSON.parse(savedAdmins);
-    const adminExists = coAdmins.find((a: any) => a.email === email && a.active);
-    
-    // For mock purposes, we accept 'admin123' as password for all co-admins
-    if (adminExists && password === 'admin123') {
-      return { token: `mock-token-${adminExists.id}` };
-    }
+export async function verifyAdminOTP(mobile: string, otp: string) {
+  const res = await fetch(`${BASE_URL}/admin/login/mobile/verify`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', 'X-API-Key': 'fnw4ua8bdueu5vckkhg56jaq8xy9m8' },
+    body: JSON.stringify({ mobile, otp })
+  });
+  if (!res.ok) {
+    const error = await res.json();
+    throw new Error(error.detail || 'Invalid OTP');
   }
-
-  throw new Error('Invalid email or password');
+  return await res.json();
 }
 
 export async function listOngoingRides() {
