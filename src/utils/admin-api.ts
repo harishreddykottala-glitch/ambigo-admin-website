@@ -1,8 +1,6 @@
-// Mock API Data for demonstration purposes
-
-const BASE_URL = import.meta.env.VITE_API_URL || '/api';
-const WS_URL = import.meta.env.VITE_WS_URL || 'wss://ambigo.in/ws';
-export const LIVE_MEDIA_URL = import.meta.env.VITE_MEDIA_URL || 'https://ambigo.in';
+const BASE_URL = 'https://ambigo.in/api';
+const WS_URL = 'wss://ambigo.in/ws';
+export const LIVE_MEDIA_URL = 'https://ambigo.in';
 
 export function getMediaUrl(url: string | undefined | null) {
   if (!url) return '';
@@ -67,6 +65,15 @@ export async function listCompletedRides() {
   return await res.json();
 }
 
+export async function fetchDashboardStats() {
+  const res = await fetch(`${BASE_URL}/admin/dashboard/stats`, {
+    method: 'GET',
+    headers: getHeaders(),
+  });
+  if (!res.ok) throw new Error('Failed to fetch dashboard stats');
+  return await res.json();
+}
+
 export async function listDrivers(skip: number = 0) {
   const res = await fetch(`${BASE_URL}/admin/driver/list`, {
     method: 'POST',
@@ -75,6 +82,15 @@ export async function listDrivers(skip: number = 0) {
   });
   if (!res.ok) throw new Error('Failed to fetch drivers');
   return await res.json(); // Returns { total: X, data: [...] }
+}
+
+export async function listAllDrivers() {
+  const res = await fetch(`${BASE_URL}/admin/driver/list/all`, {
+    method: 'POST',
+    headers: getHeaders()
+  });
+  if (!res.ok) throw new Error('Failed to fetch all drivers');
+  return await res.json();
 }
 
 export async function listUnverifiedDrivers() {
@@ -93,6 +109,16 @@ export async function fetchUnverifiedDriver(id: string) {
     body: JSON.stringify({ id })
   });
   if (!res.ok) throw new Error('Failed to fetch unverified driver details');
+  return await res.json();
+}
+
+export async function fetchDriverDetails(id: string) {
+  const res = await fetch(`${BASE_URL}/admin/driver/details`, {
+    method: 'POST',
+    headers: getHeaders(),
+    body: JSON.stringify({ id })
+  });
+  if (!res.ok) throw new Error('Failed to fetch driver details');
   return await res.json();
 }
 
@@ -115,6 +141,8 @@ export async function rejectDriver(id: string, reason: string) {
   if (!res.ok) throw new Error('Failed to reject driver');
   return await res.json();
 }
+
+
 
 export async function listUsers() {
   const res = await fetch(`${BASE_URL}/admin/user/list`, {
@@ -159,4 +187,52 @@ export function createFleetWebSocket(onMessage: (data: any) => void, onError: (e
   ws.onerror = onError;
   
   return ws;
+}
+
+export async function listCoAdmins() {
+  const res = await fetch(`${BASE_URL}/admin/co_admins`, {
+    headers: getHeaders()
+  });
+  if (!res.ok) {
+    const errorData = await res.json().catch(() => null);
+    throw new Error(errorData?.detail || 'Failed to fetch co-admins');
+  }
+  return res.json();
+}
+
+export async function addCoAdmin(name: string, mobile: string, role: string) {
+  const res = await fetch(`${BASE_URL}/admin/co_admins`, {
+    method: 'POST',
+    headers: getHeaders(),
+    body: JSON.stringify({ name, mobile, role })
+  });
+  if (!res.ok) {
+    const errorData = await res.json().catch(() => null);
+    throw new Error(errorData?.detail || 'Failed to add co-admin');
+  }
+  return res.json();
+}
+
+export async function toggleCoAdmin(id: string) {
+  const res = await fetch(`${BASE_URL}/admin/co_admins/${id}/toggle`, {
+    method: 'PUT',
+    headers: getHeaders()
+  });
+  if (!res.ok) {
+    const errorData = await res.json().catch(() => null);
+    throw new Error(errorData?.detail || 'Failed to toggle admin status');
+  }
+  return res.json();
+}
+
+export async function deleteCoAdmin(id: string) {
+  const res = await fetch(`${BASE_URL}/admin/co_admins/${id}`, {
+    method: 'DELETE',
+    headers: getHeaders()
+  });
+  if (!res.ok) {
+    const errorData = await res.json().catch(() => null);
+    throw new Error(errorData?.detail || 'Failed to delete admin');
+  }
+  return res.json();
 }

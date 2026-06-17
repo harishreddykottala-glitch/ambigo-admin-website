@@ -1,12 +1,14 @@
 import { useEffect, useState } from 'react';
 import { Building2, Loader, MapPin, Clock } from 'lucide-react';
-import { listHospitals } from '../../utils/admin-api';
+import { useAppDispatch, useAppSelector } from '../../store/hooks';
+import { fetchHospitals } from '../../store/slices/hospitalsSlice';
 import '../../assets/admin.css';
 
 export default function AdminHospitals() {
-  const [hospitals, setHospitals] = useState<any[]>([]);
-  const [loading, setLoading] = useState(true);
+  const dispatch = useAppDispatch();
+  const { hospitals, status } = useAppSelector(state => state.hospitals);
   const [selectedHospital, setSelectedHospital] = useState<any>(null);
+  const [skip, setSkip] = useState(0);
 
   const getI18nText = (field: any) => {
     if (!field) return 'N/A';
@@ -14,21 +16,14 @@ export default function AdminHospitals() {
     return field.en || field[Object.keys(field)[0]] || 'N/A';
   };
 
-  const loadHospitals = async () => {
-    try {
-      setLoading(true);
-      const data = await listHospitals();
-      setHospitals(data || []);
-    } catch (error) {
-      console.error(error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
   useEffect(() => {
-    loadHospitals();
-  }, []);
+    if (status === 'idle') {
+      dispatch(fetchHospitals());
+    }
+  }, [status, dispatch]);
+
+  const total = hospitals.length;
+  const paginatedHospitals = hospitals.slice(skip, skip + 10);
 
   return (
     <div className="admin-card fade-in">
@@ -37,7 +32,7 @@ export default function AdminHospitals() {
         <span className="admin-badge bg-blue">{hospitals.length} Total</span>
       </div>
       
-      {loading ? (
+      {status === 'loading' ? (
         <div style={{ textAlign: 'center', padding: '3rem' }}><Loader className="spin text-blue" /></div>
       ) : hospitals.length === 0 ? (
         <div style={{ padding: '3rem', textAlign: 'center', color: '#64748b' }}>
@@ -57,7 +52,7 @@ export default function AdminHospitals() {
               </tr>
             </thead>
             <tbody>
-              {hospitals.map(h => (
+              {paginatedHospitals.map(h => (
                 <tr key={h._id}>
                   <td style={{ fontWeight: 500, color: '#0f172a' }}>{getI18nText(h.name)}</td>
                   <td>{getI18nText(h.city)}</td>
@@ -76,6 +71,31 @@ export default function AdminHospitals() {
               ))}
             </tbody>
           </table>
+        </div>
+      )}
+
+      {/* Pagination Controls */}
+      {status !== 'loading' && total > 10 && (
+        <div style={{ display: 'flex', justifyContent: 'space-between', padding: '16px', borderTop: '1px solid #e2e8f0', alignItems: 'center' }}>
+          <button 
+            onClick={() => setSkip(Math.max(0, skip - 10))} 
+            disabled={skip === 0}
+            className="admin-btn secondary"
+            style={{ opacity: skip === 0 ? 0.5 : 1, cursor: skip === 0 ? 'not-allowed' : 'pointer' }}
+          >
+            Previous
+          </button>
+          <span style={{ fontSize: '0.9rem', color: '#64748b', alignSelf: 'center' }}>
+            Showing {skip + 1} to {Math.min(skip + 10, total)} of {total} hospitals
+          </span>
+          <button 
+            onClick={() => setSkip(skip + 10)} 
+            disabled={skip + 10 >= total}
+            className="admin-btn secondary"
+            style={{ opacity: skip + 10 >= total ? 0.5 : 1, cursor: skip + 10 >= total ? 'not-allowed' : 'pointer' }}
+          >
+            Next
+          </button>
         </div>
       )}
 

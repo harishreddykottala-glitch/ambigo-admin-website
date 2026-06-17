@@ -1,15 +1,23 @@
-import { Outlet, NavLink, useNavigate, useLocation } from 'react-router-dom';
+import { Outlet, NavLink, useNavigate, useLocation, Navigate } from 'react-router-dom';
 import { Home, Map, Activity, Users, ShieldCheck, Users2, Settings, Building2 } from 'lucide-react';
+import { useAppDispatch, useAppSelector } from '../../store/hooks';
+import { logout } from '../../store/slices/authSlice';
 import '../../assets/admin.css';
 
 const AdminLayout = () => {
   const navigate = useNavigate();
   const location = useLocation();
+  const dispatch = useAppDispatch();
+  const isAuthenticated = useAppSelector(state => state.auth.isAuthenticated);
 
   const handleLogout = () => {
-    localStorage.removeItem('admin_token');
+    dispatch(logout());
     navigate('/admin/login');
   };
+
+  if (!isAuthenticated) {
+    return <Navigate to="/admin/login" replace />;
+  }
 
   const getBreadcrumbName = () => {
     const path = location.pathname;
@@ -37,29 +45,29 @@ const AdminLayout = () => {
 
         <div className="admin-sidebar-links">
           <NavLink to="/admin/dashboard" className={({isActive}) => `admin-sidebar-item ${isActive ? 'active' : ''}`}>
-            <Home size={18} /> <span>Dashboard</span>
+            <div className="icon-wrapper"><Home size={18} /></div> <span>Dashboard</span>
           </NavLink>
           <NavLink to="/admin/map" className={({isActive}) => `admin-sidebar-item ${isActive ? 'active' : ''}`}>
-            <Map size={18} /> <span>Live Map</span>
+            <div className="icon-wrapper"><Map size={18} /></div> <span>Live Map</span>
           </NavLink>
           <NavLink to="/admin/bookings" className={({isActive}) => `admin-sidebar-item ${isActive ? 'active' : ''}`}>
-            <Activity size={18} /> <span>Bookings</span>
+            <div className="icon-wrapper"><Activity size={18} /></div> <span>Bookings</span>
           </NavLink>
           <NavLink to="/admin/fleet" className={({isActive}) => `admin-sidebar-item ${isActive ? 'active' : ''}`}>
-            <Users size={18} /> <span>Fleet</span>
+            <div className="icon-wrapper"><Users size={18} /></div> <span>Fleet</span>
           </NavLink>
           <NavLink to="/admin/verify-drivers" className={({isActive}) => `admin-sidebar-item ${isActive ? 'active' : ''}`}>
-            <ShieldCheck size={18} /> <span>Verify</span>
+            <div className="icon-wrapper"><ShieldCheck size={18} /></div> <span>Verify</span>
           </NavLink>
           <NavLink to="/admin/users" className={({isActive}) => `admin-sidebar-item ${isActive ? 'active' : ''}`}>
-            <Users2 size={18} /> <span>Riders</span>
+            <div className="icon-wrapper"><Users2 size={18} /></div> <span>Riders</span>
           </NavLink>
           <NavLink to="/admin/hospitals" className={({isActive}) => `admin-sidebar-item ${isActive ? 'active' : ''}`}>
-            <Building2 size={18} /> <span>Hospitals</span>
+            <div className="icon-wrapper"><Building2 size={18} /></div> <span>Hospitals</span>
           </NavLink>
           <div className="admin-sidebar-divider" style={{height: '1px', background: 'var(--admin-border)', margin: '16px 0'}}></div>
           <NavLink to="/admin/co-admins" className={({isActive}) => `admin-sidebar-item ${isActive ? 'active' : ''}`}>
-            <Settings size={18} /> <span>Co-Admins</span>
+            <div className="icon-wrapper"><Settings size={18} /></div> <span>Co-Admins</span>
           </NavLink>
         </div>
 

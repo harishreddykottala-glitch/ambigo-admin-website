@@ -12,6 +12,7 @@ import AdminVerifyDrivers from './pages/admin/AdminVerifyDrivers'
 import AdminUsers from './pages/admin/AdminUsers'
 import AdminHospitals from './pages/admin/AdminHospitals'
 import AdminCoAdmins from './pages/admin/AdminCoAdmins'
+import AdminRideTracker from './pages/admin/AdminRideTracker'
 
 function ScrollToTop() {
   const { pathname } = useLocation()
@@ -35,6 +36,7 @@ function App() {
           <Route path="dashboard" element={<AdminDashboard />} />
           <Route path="map" element={<AdminRealMap />} />
           <Route path="bookings" element={<AdminLiveBookings />} />
+          <Route path="live-ride/:id" element={<AdminRideTracker />} />
           <Route path="fleet" element={<AdminFleetControl />} />
           <Route path="verify-drivers" element={<AdminVerifyDrivers />} />
           <Route path="users" element={<AdminUsers />} />

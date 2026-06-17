@@ -1,29 +1,47 @@
 import { useEffect, useState } from 'react';
-import { ShieldCheck, UserCheck, UserX, Loader } from 'lucide-react';
-import { listUnverifiedDrivers, fetchUnverifiedDriver, acceptDriver, rejectDriver, getMediaUrl } from '../../utils/admin-api';
+import { ShieldCheck, UserCheck, UserX, Loader, Search } from 'lucide-react';
+import { fetchUnverifiedDriver, acceptDriver, rejectDriver, getMediaUrl, listAmbulanceTypes } from '../../utils/admin-api';
+import { useAppDispatch, useAppSelector } from '../../store/hooks';
+import { fetchUnverifiedDrivers } from '../../store/slices/fleetSlice';
 import '../../assets/admin.css';
 
 export default function AdminVerifyDrivers() {
-  const [drivers, setDrivers] = useState<any[]>([]);
-  const [loading, setLoading] = useState(true);
+  const dispatch = useAppDispatch();
+  const { unverifiedDrivers: drivers, unverifiedStatus: status } = useAppSelector(state => state.fleet);
+
   const [selectedDriver, setSelectedDriver] = useState<any | null>(null);
   const [previewImage, setPreviewImage] = useState<string | null>(null);
+  const [ambulanceTypes, setAmbulanceTypes] = useState<Record<string, string>>({});
+  const [skip, setSkip] = useState(0);
+  const [searchQuery, setSearchQuery] = useState('');
 
-  const loadDrivers = async () => {
+  const loadDrivers = () => {
+    dispatch(fetchUnverifiedDrivers());
+  };
+
+  const fetchAmbulanceTypes = async () => {
     try {
-      setLoading(true);
-      const data = await listUnverifiedDrivers();
-      setDrivers(data || []);
+      const types = await listAmbulanceTypes();
+      const typeMap: Record<string, string> = {};
+      types.forEach((t: any) => {
+        typeMap[t._id] = t.name;
+      });
+      setAmbulanceTypes(typeMap);
     } catch (error) {
-      console.error(error);
-    } finally {
-      setLoading(false);
+      console.error('Failed to fetch ambulance types', error);
     }
   };
 
   useEffect(() => {
-    loadDrivers();
-  }, []);
+    if (status === 'idle') {
+      loadDrivers();
+    }
+    fetchAmbulanceTypes();
+  }, [status, dispatch]);
+
+  useEffect(() => {
+    setSkip(0);
+  }, [searchQuery]);
 
   const handleSelectDriver = async (id: string) => {
     try {
@@ -80,29 +98,52 @@ export default function AdminVerifyDrivers() {
   return (
     <>
       <div className="admin-card">
-        <div className="admin-card-header">
-          <h3 className="admin-card-title"><ShieldCheck size={18} /> Pending Verifications</h3>
+        <div className="admin-card-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '15px' }}>
+          <h3 className="admin-card-title" style={{ margin: 0, display: 'flex', alignItems: 'center', gap: '8px' }}><ShieldCheck size={18} /> Pending Verifications</h3>
+          
+          <div style={{ position: 'relative', width: '250px' }}>
+            <input 
+              type="text" 
+              placeholder="Search by name or mobile..." 
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="admin-search-input"
+            />
+            <Search size={16} style={{ position: 'absolute', left: '10px', top: '50%', transform: 'translateY(-50%)', color: '#94a3b8' }} />
+          </div>
         </div>
-        {loading ? (
+        {status === 'loading' && drivers.length === 0 ? (
           <div style={{ textAlign: 'center', padding: '2rem' }}><Loader className="spin" /></div>
         ) : drivers.length === 0 ? (
           <p style={{ padding: '1rem', color: '#64748b' }}>No pending drivers.</p>
         ) : (
-          <table className="admin-table">
-            <thead>
-              <tr>
-                <th>Name</th>
-                <th>Mobile</th>
-                <th>Vehicle</th>
-                <th>Action</th>
-              </tr>
-            </thead>
-            <tbody>
-              {drivers.map(d => (
-                <tr key={d._id}>
-                  <td>{d.name}</td>
-                  <td>{d.mobile}</td>
-                  <td>{d.vehicle_type} - {d.vehicle_registration}</td>
+          <>
+            <table className="admin-table">
+              <thead>
+                <tr>
+                  <th>Name</th>
+                  <th>Mobile</th>
+                  <th>Vehicle</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+              <tbody>
+                {(() => {
+                  const filteredDrivers = drivers.filter(d => {
+                    return d.name?.toLowerCase().includes(searchQuery.toLowerCase()) || 
+                           d.mobile?.includes(searchQuery);
+                  });
+                  const paginatedDrivers = filteredDrivers.slice(skip, skip + 10);
+                  
+                  if (paginatedDrivers.length === 0) {
+                    return <tr><td colSpan={4} className="text-center" style={{ padding: '1rem', color: '#64748b' }}>No drivers match your search.</td></tr>;
+                  }
+
+                  return paginatedDrivers.map(d => (
+                    <tr key={d._id}>
+                      <td>{d.name}</td>
+                      <td>{d.mobile}</td>
+                      <td>{ambulanceTypes[d.vehicle_type] || d.vehicle_type || '-'} {d.vehicle_registration ? `- ${d.vehicle_registration}` : ''}</td>
                   <td>
                     <button 
                       className="admin-btn-secondary"
@@ -111,10 +152,37 @@ export default function AdminVerifyDrivers() {
                       Review
                     </button>
                   </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+                    </tr>
+                  ));
+                })()}
+              </tbody>
+            </table>
+            
+            {/* Pagination Controls */}
+            {status !== 'loading' && drivers.length > 10 && (
+              <div style={{ display: 'flex', justifyContent: 'space-between', padding: '16px', borderTop: '1px solid #e2e8f0', alignItems: 'center' }}>
+                <button 
+                  onClick={() => setSkip(Math.max(0, skip - 10))} 
+                  disabled={skip === 0}
+                  className="admin-btn secondary"
+                  style={{ opacity: skip === 0 ? 0.5 : 1, cursor: skip === 0 ? 'not-allowed' : 'pointer' }}
+                >
+                  Previous
+                </button>
+                <span style={{ fontSize: '0.9rem', color: '#64748b', alignSelf: 'center' }}>
+                  Showing {skip + 1} to {Math.min(skip + 10, drivers.filter(d => d.name?.toLowerCase().includes(searchQuery.toLowerCase()) || d.mobile?.includes(searchQuery)).length)} of {drivers.filter(d => d.name?.toLowerCase().includes(searchQuery.toLowerCase()) || d.mobile?.includes(searchQuery)).length} pending
+                </span>
+                <button 
+                  onClick={() => setSkip(skip + 10)} 
+                  disabled={skip + 10 >= drivers.filter(d => d.name?.toLowerCase().includes(searchQuery.toLowerCase()) || d.mobile?.includes(searchQuery)).length}
+                  className="admin-btn secondary"
+                  style={{ opacity: skip + 10 >= drivers.filter(d => d.name?.toLowerCase().includes(searchQuery.toLowerCase()) || d.mobile?.includes(searchQuery)).length ? 0.5 : 1, cursor: skip + 10 >= drivers.filter(d => d.name?.toLowerCase().includes(searchQuery.toLowerCase()) || d.mobile?.includes(searchQuery)).length ? 'not-allowed' : 'pointer' }}
+                >
+                  Next
+                </button>
+              </div>
+            )}
+          </>
         )}
       </div>
 
@@ -151,7 +219,7 @@ export default function AdminVerifyDrivers() {
             )}
 
             <h5 style={{ margin: '0 0 10px', color: '#1e293b' }}>Vehicle Info</h5>
-            <p style={{ margin: '0 0 5px', color: '#475569' }}>Type: {selectedDriver.vehicle_type || 'Unknown'}</p>
+            <p style={{ margin: '0 0 5px', color: '#475569' }}>Type: {ambulanceTypes[selectedDriver.vehicle_type] || selectedDriver.vehicle_type || 'Unknown'}</p>
             <p style={{ margin: '0 0 20px', color: '#475569' }}>Registration: {selectedDriver.vehicle_registration || 'Unknown'}</p>
 
             <h5 style={{ margin: '0 0 10px', color: '#1e293b' }}>KYC Documents & Images</h5>
@@ -233,15 +301,13 @@ export default function AdminVerifyDrivers() {
 
             <div style={{ display: 'flex', gap: '1rem', marginTop: '2rem' }}>
               <button 
-                className="admin-btn-primary" 
-                style={{ flex: 1, display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '8px' }}
+                className="admin-btn-approve" 
                 onClick={() => handleAccept(selectedDriver)}
               >
                 <UserCheck size={18} /> Approve Driver
               </button>
               <button 
-                className="admin-btn-secondary" 
-                style={{ flex: 1, display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '8px', color: '#ef4444', borderColor: '#ef4444' }}
+                className="admin-btn-reject" 
                 onClick={() => handleReject(selectedDriver._id)}
               >
                 <UserX size={18} /> Reject
