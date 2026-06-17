@@ -8,7 +8,12 @@ export default defineConfig({
     port: 5174,
     proxy: {
       '/api': {
-        target: 'http://localhost:8000',
+        target: 'https://ambigo.in',
+        changeOrigin: true,
+      },
+      '/ws': {
+        target: 'wss://ambigo.in',
+        ws: true,
         changeOrigin: true,
       }
     }
