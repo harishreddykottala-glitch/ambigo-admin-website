@@ -28,10 +28,22 @@ export async function sendAdminOTP(mobile: string) {
     body: JSON.stringify({ mobile })
   });
   if (!res.ok) {
-    const error = await res.json();
-    throw new Error(error.detail || 'Failed to send OTP');
+    let errorDetail = 'Failed to send OTP';
+    try {
+      const error = await res.json();
+      errorDetail = error.detail || errorDetail;
+    } catch (e) {
+      // If it's not JSON, it might be a proxy or server crash
+      errorDetail = `Server error (${res.status})`;
+    }
+    throw new Error(errorDetail);
   }
-  return await res.json();
+  
+  try {
+    return await res.json();
+  } catch (e) {
+    throw new Error('Invalid response from server');
+  }
 }
 
 export async function verifyAdminOTP(mobile: string, otp: string) {
@@ -41,10 +53,21 @@ export async function verifyAdminOTP(mobile: string, otp: string) {
     body: JSON.stringify({ mobile, otp })
   });
   if (!res.ok) {
-    const error = await res.json();
-    throw new Error(error.detail || 'Invalid OTP');
+    let errorDetail = 'Invalid OTP';
+    try {
+      const error = await res.json();
+      errorDetail = error.detail || errorDetail;
+    } catch (e) {
+      errorDetail = `Server error (${res.status})`;
+    }
+    throw new Error(errorDetail);
   }
-  return await res.json();
+  
+  try {
+    return await res.json();
+  } catch (e) {
+    throw new Error('Invalid response from server');
+  }
 }
 
 export async function listOngoingRides() {

@@ -10,11 +10,13 @@ export default defineConfig({
       '/api': {
         target: 'https://ambigo.in',
         changeOrigin: true,
+        secure: false,
       },
       '/ws': {
         target: 'wss://ambigo.in',
         ws: true,
         changeOrigin: true,
+        secure: false,
       }
     }
   }
