@@ -62,19 +62,7 @@ export default function AdminRealMap() {
         if (data && Array.isArray(data.data)) parsedData = data.data;
         else if (Array.isArray(data)) parsedData = data;
         
-        if (parsedData.length === 0) {
-          // Inject a mock active driver for UI testing
-          parsedData = [{
-            _id: 'mock_active_driver_1',
-            name: 'Mock Online Ambulance',
-            vehicle_type: 'Advanced Life Support',
-            location: {
-              type: 'Point',
-              coordinates: [77.5946, 14.6785] // [lng, lat]
-            }
-          }];
-        }
-        
+        // Removed mock active driver injection
         setDrivers(parsedData);
       },
       (err) => {

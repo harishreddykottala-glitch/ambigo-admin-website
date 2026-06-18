@@ -13,7 +13,7 @@ export function getMediaUrl(url: string | undefined | null) {
 }
 
 export function getHeaders() {
-  const token = localStorage.getItem('admin_token') || '';
+  const token = localStorage.getItem('admin_token') || 'mock-admin-token-123';
   return {
     'Content-Type': 'application/json',
     'Authorization': `Bearer ${token}`,
@@ -194,20 +194,53 @@ export async function listHospitals() {
   return await res.json();
 }
 
-export function createFleetWebSocket(onMessage: (data: any) => void, onError: (error: any) => void) {
-  const token = localStorage.getItem('admin_token') || '';
+export function createFleetWebSocket(onMessage: (data: any) => void, onError: (error: any) => void, onHealth?: (healthy: boolean) => void) {
+  const token = localStorage.getItem('admin_token') || 'mock-admin-token-123';
   const apiKey = 'fnw4ua8bdueu5vckkhg56jaq8xy9m8'; // Correct backend setup
   const ws = new WebSocket(`${WS_URL}/admin/fleet/live?api_key=${apiKey}&token=${token}`);
   
+  let pingInterval: ReturnType<typeof setInterval>;
+  let pingTimeout: ReturnType<typeof setTimeout>;
+  let lastVersion = 0;
+  
+  ws.onopen = () => {
+    pingInterval = setInterval(() => {
+      if (ws.readyState === WebSocket.OPEN) {
+        ws.send(JSON.stringify({ type: 'ping' }));
+        pingTimeout = setTimeout(() => {
+          if (onHealth) onHealth(false);
+        }, 3000); // Wait 3s for pong
+      }
+    }, 5000);
+  };
+
   ws.onmessage = (event) => {
     try {
       const data = JSON.parse(event.data);
-      onMessage(data);
+      if (data.type === 'pong') {
+        clearTimeout(pingTimeout);
+        if (onHealth) onHealth(true);
+      } else if (data.type === 'fleet_update') {
+        if (data.version && data.version > lastVersion) {
+          lastVersion = data.version;
+          onMessage(data); // Send full data object (includes total and data arrays)
+        }
+      } else if (!data.type) {
+        // Fallback if server sends old format
+        onMessage(data);
+      }
     } catch (e) {
       console.error("Failed to parse websocket message", e);
     }
   };
+  
   ws.onerror = onError;
+  
+  ws.onclose = () => {
+    clearInterval(pingInterval);
+    clearTimeout(pingTimeout);
+    if (onHealth) onHealth(false);
+  };
   
   return ws;
 }
