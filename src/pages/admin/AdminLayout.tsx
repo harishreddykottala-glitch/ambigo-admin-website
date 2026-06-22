@@ -1,5 +1,5 @@
 import { Outlet, NavLink, useNavigate, useLocation, Navigate } from 'react-router-dom';
-import { Home, Map, Activity, Users, ShieldCheck, Users2, Settings, Building2 } from 'lucide-react';
+import { Home, Map, Activity, Users, ShieldCheck, Users2, Settings, Building2, Search, Bell, Mail, ArrowLeft, Send } from 'lucide-react';
 import { useAppDispatch, useAppSelector } from '../../store/hooks';
 import { logout } from '../../store/slices/authSlice';
 import '../../assets/admin.css';
@@ -68,19 +68,26 @@ const AdminLayout = () => {
     <div className="admin-layout-sidebar-wrapper">
       {/* Sidebar Navigation */}
       <div className="admin-sidebar">
-        <div className="admin-sidebar-brand">
+        <div className="admin-sidebar-brand" style={{gap: '12px', padding: '24px 32px'}}>
+          <div style={{background: 'var(--admin-primary)', padding: '6px', borderRadius: '8px', display: 'flex'}}>
+            <Activity size={24} color="white" />
+          </div>
           <div className="admin-logo-text">
-            <span className="text-orange" style={{fontWeight: 700, fontSize: '1.5rem'}}>Ambigo</span>
-            <span style={{fontWeight: 400, color: '#94a3b8', fontSize: '0.8rem', display: 'block'}}>Admin Platform</span>
+            <span style={{fontWeight: 800, fontSize: '1.5rem', color: '#1e293b'}}>Ambigo</span>
           </div>
         </div>
 
         <div className="admin-sidebar-links">
           {hasAccess('/admin/dashboard') && (
-            <NavLink to="/admin/dashboard" className={({isActive}) => `admin-sidebar-item ${isActive ? 'active' : ''}`}>
-              <div className="icon-wrapper"><Home size={18} /></div> <span>Dashboard</span>
-            </NavLink>
+            <>
+              <div className="admin-sidebar-section-title">Home</div>
+              <NavLink to="/admin/dashboard" className={({isActive}) => `admin-sidebar-item ${isActive ? 'active' : ''}`}>
+                <div className="icon-wrapper"><Home size={18} /></div> <span>Dashboard</span>
+              </NavLink>
+            </>
           )}
+          
+          <div className="admin-sidebar-section-title">Pages</div>
           {hasAccess('/admin/map') && (
             <NavLink to="/admin/map" className={({isActive}) => `admin-sidebar-item ${isActive ? 'active' : ''}`}>
               <div className="icon-wrapper"><Map size={18} /></div> <span>Live Map</span>
@@ -132,13 +139,32 @@ const AdminLayout = () => {
 
       {/* Main Content Area */}
       <div className="admin-main-content-area">
-        <div className="admin-topbar">
-          <div className="admin-breadcrumbs">
-            <Home size={14} /> / <span className="current">{getBreadcrumbName()}</span>
+        <div className="admin-topbar" style={{justifyContent: 'space-between', padding: '16px 32px'}}>
+          <div style={{display: 'flex', alignItems: 'center', gap: '16px'}}>
+            <div style={{background: 'var(--admin-primary)', color: 'white', padding: '8px', borderRadius: '50%', cursor: 'pointer', display: 'flex'}}>
+              <ArrowLeft size={16} />
+            </div>
+            <div className="topbar-search">
+              <Search size={16} color="#94a3b8" />
+              <input type="text" placeholder="Search..." />
+            </div>
           </div>
-          <div className="admin-topbar-profile">
-             <span style={{fontSize: '0.85rem', color: '#64748b'}}>{role}</span>
-             <img src="https://ui-avatars.com/api/?name=Admin&background=0f172a&color=fff" alt="Profile" className="admin-topbar-avatar" />
+          <div style={{display: 'flex', alignItems: 'center', gap: '24px'}}>
+            <button style={{background: 'var(--admin-primary)', color: 'white', border: 'none', borderRadius: '8px', padding: '8px 16px', display: 'flex', alignItems: 'center', gap: '8px', fontWeight: 600, cursor: 'pointer', boxShadow: '0 4px 12px rgba(59, 130, 246, 0.3)'}}>
+              <Send size={14} /> Go Pro
+            </button>
+            <div style={{fontSize: '1.2rem', cursor: 'pointer'}}>🇺🇸</div>
+            <div className="topbar-icons" style={{gap: '20px', margin: 0}}>
+              <div className="topbar-icon"><Mail size={20} color="#94a3b8" /></div>
+              <div className="topbar-icon"><Bell size={20} color="#94a3b8" /><span className="badge">3</span></div>
+            </div>
+            <div className="admin-topbar-profile" style={{display: 'flex', alignItems: 'center', gap: '12px', cursor: 'pointer'}}>
+               <img src="https://ui-avatars.com/api/?name=Admin&background=0f172a&color=fff" alt="Profile" style={{width: '40px', height: '40px', borderRadius: '50%'}} />
+               <div style={{display: 'flex', flexDirection: 'column'}}>
+                 <span style={{fontSize: '0.9rem', fontWeight: 700, color: '#1e293b', lineHeight: 1.2}}>Admin</span>
+                 <span style={{fontSize: '0.8rem', color: '#64748b', fontWeight: 500}}>{role}</span>
+               </div>
+            </div>
           </div>
         </div>
         
