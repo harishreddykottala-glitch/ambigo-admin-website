@@ -10,6 +10,7 @@ const AdminLayout = () => {
   const dispatch = useAppDispatch();
   const isAuthenticated = useAppSelector(state => state.auth.isAuthenticated);
   const role = useAppSelector(state => state.auth.role) || 'Viewer';
+  const username = useAppSelector(state => state.auth.username) || 'Admin';
 
   const hasAccess = (path: string) => {
     if (role === 'Founder / Co-founder' || role === 'Super Admin') return true;
@@ -139,29 +140,12 @@ const AdminLayout = () => {
 
       {/* Main Content Area */}
       <div className="admin-main-content-area">
-        <div className="admin-topbar" style={{justifyContent: 'space-between', padding: '16px 32px'}}>
-          <div style={{display: 'flex', alignItems: 'center', gap: '16px'}}>
-            <div style={{background: 'var(--admin-primary)', color: 'white', padding: '8px', borderRadius: '50%', cursor: 'pointer', display: 'flex'}}>
-              <ArrowLeft size={16} />
-            </div>
-            <div className="topbar-search">
-              <Search size={16} color="#94a3b8" />
-              <input type="text" placeholder="Search..." />
-            </div>
-          </div>
+        <div className="admin-topbar" style={{justifyContent: 'flex-end', padding: '16px 32px'}}>
           <div style={{display: 'flex', alignItems: 'center', gap: '24px'}}>
-            <button style={{background: 'var(--admin-primary)', color: 'white', border: 'none', borderRadius: '8px', padding: '8px 16px', display: 'flex', alignItems: 'center', gap: '8px', fontWeight: 600, cursor: 'pointer', boxShadow: '0 4px 12px rgba(59, 130, 246, 0.3)'}}>
-              <Send size={14} /> Go Pro
-            </button>
-            <div style={{fontSize: '1.2rem', cursor: 'pointer'}}>🇺🇸</div>
-            <div className="topbar-icons" style={{gap: '20px', margin: 0}}>
-              <div className="topbar-icon"><Mail size={20} color="#94a3b8" /></div>
-              <div className="topbar-icon"><Bell size={20} color="#94a3b8" /><span className="badge">3</span></div>
-            </div>
             <div className="admin-topbar-profile" style={{display: 'flex', alignItems: 'center', gap: '12px', cursor: 'pointer'}}>
                <img src="https://ui-avatars.com/api/?name=Admin&background=0f172a&color=fff" alt="Profile" style={{width: '40px', height: '40px', borderRadius: '50%'}} />
                <div style={{display: 'flex', flexDirection: 'column'}}>
-                 <span style={{fontSize: '0.9rem', fontWeight: 700, color: '#1e293b', lineHeight: 1.2}}>Admin</span>
+                 <span style={{fontSize: '0.9rem', fontWeight: 700, color: '#1e293b', lineHeight: 1.2}}>{username}</span>
                  <span style={{fontSize: '0.8rem', color: '#64748b', fontWeight: 500}}>{role}</span>
                </div>
             </div>

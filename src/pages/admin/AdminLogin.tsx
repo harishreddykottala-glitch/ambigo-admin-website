@@ -25,7 +25,7 @@ const AdminLogin = () => {
       const data = await loginAdminPassword(username, password);
       if (data.token) {
         const userRole = data.role || 'Viewer';
-        dispatch(loginSuccess({ token: data.token, role: userRole }));
+        dispatch(loginSuccess({ token: data.token, role: userRole, username: data.username }));
         
         if (userRole === 'HR Manager') navigate('/admin/co-admins');
         else if (userRole === 'Verification Executive') navigate('/admin/verify-drivers');

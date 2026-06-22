@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { fetchDashboardStats } from '../../utils/admin-api';
+import { useAppSelector } from '../../store/hooks';
 import { Activity, CarFront, Zap, AlertTriangle, ArrowUpRight, ArrowDownRight } from 'lucide-react';
 import AdminRealMap from './AdminRealMap';
 import '../../assets/admin.css';
@@ -8,6 +9,7 @@ import '../../assets/admin.css';
 const AdminDashboard = () => {
   const navigate = useNavigate();
   const [stats, setStats] = useState({ ongoing: 0, completed: 0, fleet: 0 });
+  const username = useAppSelector(state => state.auth.username) || 'Admin';
 
   useEffect(() => {
     async function fetchData() {
@@ -31,12 +33,9 @@ const AdminDashboard = () => {
       <div className="admin-hero-banner fade-in">
         <div style={{display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', position: 'relative', zIndex: 2}}>
           <div>
-            <h1 style={{fontSize: '1.5rem', fontWeight: 700, marginBottom: '4px'}}>Hello Admin!</h1>
+            <h1 style={{fontSize: '1.5rem', fontWeight: 700, marginBottom: '4px', color: 'white'}}>Hello {username}!</h1>
             <p style={{color: 'rgba(255,255,255,0.8)', fontSize: '0.85rem', maxWidth: '600px'}}>We are on a mission to help you build and manage successful fleets efficiently.</p>
           </div>
-          <button style={{background: 'rgba(255,255,255,0.2)', color: 'white', border: '1px solid rgba(255,255,255,0.3)', padding: '8px 16px', borderRadius: '8px', cursor: 'pointer', fontWeight: 600}}>
-            Announcements
-          </button>
         </div>
       </div>
 
