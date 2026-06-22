@@ -143,7 +143,7 @@ const AdminLayout = () => {
         <div className="admin-topbar" style={{justifyContent: 'flex-end', padding: '16px 32px'}}>
           <div style={{display: 'flex', alignItems: 'center', gap: '24px'}}>
             <div className="admin-topbar-profile" style={{display: 'flex', alignItems: 'center', gap: '12px', cursor: 'pointer'}}>
-               <img src="https://ui-avatars.com/api/?name=Admin&background=0f172a&color=fff" alt="Profile" style={{width: '40px', height: '40px', borderRadius: '50%'}} />
+               <img src={`https://ui-avatars.com/api/?name=${username}&background=0f172a&color=fff`} alt="Profile" style={{width: '40px', height: '40px', borderRadius: '50%'}} />
                <div style={{display: 'flex', flexDirection: 'column'}}>
                  <span style={{fontSize: '0.9rem', fontWeight: 700, color: '#1e293b', lineHeight: 1.2}}>{username}</span>
                  <span style={{fontSize: '0.8rem', color: '#64748b', fontWeight: 500}}>{role}</span>
