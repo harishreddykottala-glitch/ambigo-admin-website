@@ -150,7 +150,7 @@ export default function AdminRealMap() {
 
       <div style={{ position: 'absolute', top: 20, right: 20, zIndex: 1000, background: 'rgba(255, 255, 255, 0.95)', padding: '20px', borderRadius: '12px', boxShadow: '0 10px 25px rgba(0,0,0,0.15)', minWidth: '220px', backdropFilter: 'blur(10px)', transition: 'all 0.3s ease', maxHeight: isPanelExpanded ? '80vh' : '100px', display: 'flex', flexDirection: 'column' }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: isPanelExpanded ? '15px' : '0' }}>
-          <h3 style={{ margin: 0, fontSize: '18px', color: '#1e293b', display: 'flex', alignItems: 'center' }}>
+          <h3 style={{ margin: 0, fontSize: '18px', fontWeight: 500, color: '#1e293b', display: 'flex', alignItems: 'center' }}>
             Fleet Status 
             <span className="live-dot" style={{ display: 'inline-block', width: '8px', height: '8px', background: '#22c55e', borderRadius: '50%', marginLeft: '8px', animation: 'pulse 2s infinite' }}></span>
           </h3>
