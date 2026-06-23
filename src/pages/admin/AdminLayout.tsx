@@ -49,11 +49,15 @@ const AdminLayout = () => {
   }
 
   if (location.pathname !== '/admin' && !hasAccess(location.pathname)) {
-    if (role === 'HR Manager') return <Navigate to="/admin/co-admins" replace />;
-    if (role === 'Verification Executive') return <Navigate to="/admin/verify-drivers" replace />;
-    if (role === 'Call Center Executive') return <Navigate to="/admin/map" replace />;
-    if (role === 'Support Executive' || role === 'Customer Executive') return <Navigate to="/admin/bookings" replace />;
-    return <Navigate to="/admin/dashboard" replace />;
+    return (
+      <div style={{ padding: 50, textAlign: 'center', background: '#fff', color: '#000', height: '100vh' }}>
+        <h2>Access Denied</h2>
+        <p>You are being blocked by AdminLayout.</p>
+        <p><strong>Your Current Role in System:</strong> "{role}"</p>
+        <p><strong>Attempted Path:</strong> "{location.pathname}"</p>
+        <button onClick={handleLogout} style={{ padding: '10px 20px', marginTop: 20 }}>Force Sign Out</button>
+      </div>
+    );
   }
 
   return (
