@@ -1,13 +1,15 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { fetchDashboardStats } from '../../utils/admin-api';
-import { Activity, CarFront, Zap, AlertTriangle } from 'lucide-react';
+import { useAppSelector } from '../../store/hooks';
+import { Activity, CarFront, Zap, AlertTriangle, ArrowUpRight, ArrowDownRight } from 'lucide-react';
 import AdminRealMap from './AdminRealMap';
 import '../../assets/admin.css';
 
 const AdminDashboard = () => {
   const navigate = useNavigate();
   const [stats, setStats] = useState({ ongoing: 0, completed: 0, fleet: 0 });
+  const username = useAppSelector(state => state.auth.username) || 'Admin';
 
   useEffect(() => {
     async function fetchData() {
@@ -27,160 +29,122 @@ const AdminDashboard = () => {
 
   return (
     <div>
-      {/* Top Stats Row */}
-      <div className="admin-stats-row" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '20px', marginBottom: '24px' }}>
-        <div className="glass-panel admin-mini-stat fade-in" style={{ padding: '20px' }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: '100%' }}>
-            <div>
-              <div className="label" style={{ color: '#64748b', fontSize: '0.85rem', fontWeight: 600, marginBottom: '4px' }}>Active Bookings</div>
-              <div className="value-row">
-                <span className="val" style={{ color: '#1e293b', fontSize: '1.5rem', fontWeight: 700 }}>{stats.ongoing}</span>
-              </div>
-            </div>
-            <div className="hoverable-icon" style={{ background: 'var(--admin-primary)', padding: '12px', borderRadius: '12px', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 4px 15px rgba(255, 107, 53, 0.3)' }}>
-              <Activity size={24} />
-            </div>
-          </div>
-        </div>
-        <div className="glass-panel admin-mini-stat fade-in" style={{ padding: '20px', animationDelay: '0.1s' }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: '100%' }}>
-            <div>
-              <div className="label" style={{ color: '#64748b', fontSize: '0.85rem', fontWeight: 600, marginBottom: '4px' }}>Total Fleet</div>
-              <div className="value-row">
-                <span className="val" style={{ color: '#1e293b', fontSize: '1.5rem', fontWeight: 700 }}>{stats.fleet}</span>
-              </div>
-            </div>
-            <div className="hoverable-icon" style={{ background: 'var(--admin-primary)', padding: '12px', borderRadius: '12px', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 4px 15px rgba(255, 107, 53, 0.3)' }}>
-              <CarFront size={24} />
-            </div>
-          </div>
-        </div>
-        <div className="glass-panel admin-mini-stat fade-in" style={{ padding: '20px', animationDelay: '0.2s' }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: '100%' }}>
-            <div>
-              <div className="label" style={{ color: '#64748b', fontSize: '0.85rem', fontWeight: 600, marginBottom: '4px' }}>Completed Trips</div>
-              <div className="value-row">
-                <span className="val" style={{ color: '#1e293b', fontSize: '1.5rem', fontWeight: 700 }}>{stats.completed}</span>
-              </div>
-            </div>
-            <div className="hoverable-icon" style={{ background: 'var(--admin-primary)', padding: '12px', borderRadius: '12px', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 4px 15px rgba(255, 107, 53, 0.3)' }}>
-              <Zap size={24} />
-            </div>
-          </div>
-        </div>
-        <div className="glass-panel admin-mini-stat fade-in" style={{ padding: '20px', animationDelay: '0.3s' }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: '100%' }}>
-            <div>
-              <div className="label" style={{ color: '#64748b', fontSize: '0.85rem', fontWeight: 600, marginBottom: '4px' }}>Avg Response</div>
-              <div className="value-row">
-                <span className="val" style={{ color: '#1e293b', fontSize: '1.5rem', fontWeight: 700 }}>4.2 <span style={{ fontSize: '1rem', color: '#64748b', fontWeight: 500 }}>Mins</span></span>
-              </div>
-            </div>
-            <div className="hoverable-icon" style={{ background: 'var(--admin-primary)', padding: '12px', borderRadius: '12px', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 4px 15px rgba(255, 107, 53, 0.3)' }}>
-              <AlertTriangle size={24} />
-            </div>
+      {/* Hero Banner */}
+      <div className="admin-hero-banner fade-in">
+        <div style={{display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', position: 'relative', zIndex: 2}}>
+          <div>
+            <h1 style={{fontSize: '1.5rem', fontWeight: 700, marginBottom: '4px', color: 'white'}}>Hello {username}!</h1>
+            <p style={{color: 'rgba(255,255,255,0.8)', fontSize: '0.85rem', maxWidth: '600px'}}>We are on a mission to help you build and manage successful fleets efficiently.</p>
           </div>
         </div>
       </div>
 
-      <div className="admin-dashboard-grid">
-        {/* Left Grid */}
-        <div className="admin-left-grid">
-          {/* Status Panel */}
-          <div className="glass-panel fade-in" style={{animationDelay: '0.4s'}}>
-            <div className="status-card-header">Fleet Readiness Score</div>
-            <div className="progress-value-large">94%</div>
-            <p style={{fontSize: '0.85rem', color: '#64748b'}}>Optimal readiness for incoming dispatches.</p>
-            <div className="progress-bar-container">
-              <div className="progress-track">
-                <div className="progress-fill"></div>
-              </div>
+      {/* Top Stats Row */}
+      <div className="admin-stats-overlap admin-stats-row" style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '16px', marginBottom: '16px' }}>
+        
+        <div className="glass-panel fade-in" style={{ padding: '16px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '14px', width: '100%' }}>
+            <div style={{ width: '40px', height: '40px', borderRadius: '50%', border: '3px solid #3b82f6', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#3b82f6', flexShrink: 0 }}>
+              <ArrowUpRight size={18} />
             </div>
-            <div className="flex-between mt-4">
-              <span className="admin-badge" style={{background: 'rgba(16, 185, 129, 0.1)', color: '#10b981'}}>Excellent</span>
-              <span style={{fontSize: '0.85rem', color: '#64748b'}}>Updated 1m ago</span>
-            </div>
-          </div>
-
-          {/* Alerts List */}
-          <div className="glass-panel fade-in" style={{animationDelay: '0.5s'}}>
-            <div className="status-card-header flex-between">
-              <span>Why The Risk?</span>
-              <button className="admin-btn-text" style={{fontSize: '0.75rem'}} onClick={() => navigate('/admin/fleet')}>View all</button>
-            </div>
-            <div className="alert-list">
-              <div className="alert-item">
-                <div className="alert-icon bg-red"><AlertTriangle size={14} /></div>
-                <div className="alert-content">
-                  <h4>High Traffic - Zone C</h4>
-                  <p>Increases estimated arrival times.</p>
-                </div>
-              </div>
-              <div className="alert-item">
-                <div className="alert-icon bg-orange"><Activity size={14} /></div>
-                <div className="alert-content">
-                  <h4>ALS Vehicle Shortage</h4>
-                  <p>Only 2 Advanced Life Support units available.</p>
-                </div>
-              </div>
-              <div className="alert-item">
-                <div className="alert-icon bg-blue"><Zap size={14} /></div>
-                <div className="alert-content">
-                  <h4>Surge Expected</h4>
-                  <p>Peak hour starting in 30 mins.</p>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* Epigenetic-style cards (Fleet Categories) */}
-          <div className="glass-panel fade-in" style={{gridColumn: '1 / -1', animationDelay: '0.6s'}}>
-            <div className="status-card-header" style={{ color: '#1e293b', fontWeight: 700, marginBottom: '20px' }}>Fleet Categories Overview</div>
-            <div style={{display: 'flex', gap: '16px'}}>
-              <div style={{flex: 1, padding: '20px', background: '#f8fafc', borderRadius: '16px', border: '1px solid #e2e8f0'}}>
-                <div className="flex-between mb-4">
-                  <div style={{display: 'flex', alignItems: 'center', gap: '12px'}}>
-                    <div className="hoverable-icon" style={{background: 'var(--admin-primary)', color: 'white', padding: '10px', borderRadius: '10px'}}>
-                      <CarFront size={18} />
-                    </div>
-                    <span style={{fontWeight: 600, color: '#1e293b'}}>BLS Units</span>
-                  </div>
-                  <span style={{color: '#10b981', fontSize: '0.85rem', fontWeight: 600}}>Optimal</span>
-                </div>
-                <div style={{fontSize: '2rem', fontWeight: 700, color: '#1e293b'}}>12 <span style={{fontSize: '0.85rem', color: '#64748b', fontWeight: 400}}>available</span></div>
-                <div style={{marginTop: '16px', fontSize: '0.85rem', color: '#64748b'}}>Basic Life Support vehicles equipped for standard transport.</div>
-              </div>
-              
-              <div style={{flex: 1, padding: '20px', background: '#f8fafc', borderRadius: '16px', border: '1px solid #e2e8f0'}}>
-                <div className="flex-between mb-4">
-                  <div style={{display: 'flex', alignItems: 'center', gap: '12px'}}>
-                    <div className="hoverable-icon" style={{background: 'var(--admin-primary)', color: 'white', padding: '10px', borderRadius: '10px'}}>
-                      <Activity size={18} />
-                    </div>
-                    <span style={{fontWeight: 600, color: '#1e293b'}}>ALS Units</span>
-                  </div>
-                  <span style={{color: '#ea580c', fontSize: '0.85rem', fontWeight: 600}}>Suboptimal</span>
-                </div>
-                <div style={{fontSize: '2rem', fontWeight: 700, color: '#1e293b'}}>2 <span style={{fontSize: '0.85rem', color: '#64748b', fontWeight: 400}}>available</span></div>
-                <div style={{marginTop: '16px', fontSize: '0.85rem', color: '#64748b'}}>Advanced Life Support with paramedics on board.</div>
-              </div>
+            <div>
+              <div style={{ color: '#94a3b8', fontSize: '0.8rem', fontWeight: 600, marginBottom: '2px' }}>Active Bookings</div>
+              <div style={{ color: '#1e293b', fontSize: '1.25rem', fontWeight: 600 }}>{stats.ongoing}</div>
             </div>
           </div>
         </div>
 
-        {/* Right Column (Digital Twin / 3D Map) */}
-        <div className="admin-right-column fade-in" style={{animationDelay: '0.7s'}}>
-          <div className="glass-panel map-container-card">
-            <div className="map-card-header flex-between">
-              <div>
-                <h3>Real-Time Fleet Locator</h3>
-                <p>Live GPS tracking of your active fleet.</p>
-              </div>
-              <button className="admin-btn secondary" style={{padding: '6px 12px', fontSize: '0.8rem'}} onClick={() => navigate('/admin/map')}>View Full Map</button>
+        <div className="glass-panel fade-in" style={{ padding: '16px', animationDelay: '0.1s' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '14px', width: '100%' }}>
+            <div style={{ width: '40px', height: '40px', borderRadius: '50%', border: '3px solid #10b981', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#10b981', flexShrink: 0 }}>
+              <ArrowUpRight size={18} />
             </div>
-            <AdminRealMap />
+            <div>
+              <div style={{ color: '#94a3b8', fontSize: '0.8rem', fontWeight: 600, marginBottom: '2px' }}>Total Fleet</div>
+              <div style={{ color: '#1e293b', fontSize: '1.25rem', fontWeight: 600 }}>{stats.fleet}</div>
+            </div>
           </div>
         </div>
+
+        <div className="glass-panel fade-in" style={{ padding: '16px', animationDelay: '0.2s' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '14px', width: '100%' }}>
+            <div style={{ width: '40px', height: '40px', borderRadius: '50%', border: '3px solid #8b5cf6', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#8b5cf6', flexShrink: 0 }}>
+              <ArrowUpRight size={18} />
+            </div>
+            <div>
+              <div style={{ color: '#94a3b8', fontSize: '0.8rem', fontWeight: 600, marginBottom: '2px' }}>Completed Trips</div>
+              <div style={{ color: '#1e293b', fontSize: '1.25rem', fontWeight: 600 }}>{stats.completed}</div>
+            </div>
+          </div>
+        </div>
+
+        <div className="glass-panel fade-in" style={{ padding: '16px', animationDelay: '0.3s' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '14px', width: '100%' }}>
+            <div style={{ width: '40px', height: '40px', borderRadius: '50%', border: '3px solid #ef4444', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#ef4444', flexShrink: 0 }}>
+              <ArrowDownRight size={18} />
+            </div>
+            <div>
+              <div style={{ color: '#94a3b8', fontSize: '0.8rem', fontWeight: 600, marginBottom: '2px' }}>Avg Response</div>
+              <div style={{ color: '#1e293b', fontSize: '1.25rem', fontWeight: 600 }}>4.2 <span style={{ fontSize: '0.85rem', color: '#64748b', fontWeight: 500 }}>Mins</span></div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <div style={{display: 'flex', gap: '16px', padding: '0 24px', minHeight: '400px', paddingBottom: '16px'}}>
+         {/* Left Side: Real-Time Map (Acting as the big chart in Hope UI) */}
+         <div className="glass-panel fade-in" style={{flex: 2, padding: 0, overflow: 'hidden', display: 'flex', flexDirection: 'column'}}>
+            <div style={{padding: '24px', borderBottom: '1px solid #f1f5f9', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexShrink: 0}}>
+               <div>
+                  <h3 style={{fontSize: '1.1rem', fontWeight: 700, color: '#1e293b'}}>Fleet Live Locator</h3>
+                  <p style={{color: '#94a3b8', fontSize: '0.85rem', marginTop: '4px'}}>Real-time GPS tracking of active dispatch</p>
+               </div>
+               <button onClick={() => navigate('/admin/map')} style={{background: 'transparent', border: '1px solid #e2e8f0', color: '#64748b', padding: '6px 16px', borderRadius: '8px', fontSize: '0.85rem', fontWeight: 600, cursor: 'pointer'}}>View Details</button>
+            </div>
+            <div style={{flex: 1, minHeight: 0, position: 'relative'}}>
+               <AdminRealMap />
+            </div>
+         </div>
+
+         {/* Right Side: Simple Stats / Readiness Card (Acting as the side stats in Hope UI) */}
+         <div className="glass-panel fade-in" style={{flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden'}}>
+            <div style={{background: 'linear-gradient(135deg, #10b981, #059669)', borderRadius: '12px', padding: '16px', color: 'white', marginBottom: '16px', boxShadow: '0 10px 20px rgba(16, 185, 129, 0.2)'}}>
+               <div style={{fontSize: '0.75rem', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '1px', opacity: 0.9}}>Fleet Readiness</div>
+               <div style={{fontSize: '2rem', fontWeight: 800, margin: '4px 0'}}>94%</div>
+               <div style={{fontSize: '0.75rem', opacity: 0.9}}>Optimal readiness for dispatches.</div>
+            </div>
+            
+            <h4 style={{fontSize: '0.9rem', fontWeight: 700, color: '#1e293b', marginBottom: '12px'}}>Fleet Categories</h4>
+            
+            <div style={{display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '12px'}}>
+               <div style={{background: 'rgba(59, 130, 246, 0.1)', padding: '12px', borderRadius: '12px'}}><CarFront size={20} color="#3b82f6"/></div>
+               <div style={{flex: 1}}>
+                  <div style={{fontWeight: 600, color: '#1e293b', fontSize: '0.95rem'}}>BLS Units</div>
+                  <div style={{fontSize: '0.8rem', color: '#64748b', marginTop: '2px'}}>Basic Life Support</div>
+               </div>
+               <div style={{fontWeight: 700, fontSize: '1.1rem', color: '#1e293b'}}>12</div>
+            </div>
+            
+            <div style={{display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '12px'}}>
+               <div style={{background: 'rgba(16, 185, 129, 0.1)', padding: '12px', borderRadius: '12px'}}><Activity size={20} color="#10b981"/></div>
+               <div style={{flex: 1}}>
+                  <div style={{fontWeight: 600, color: '#1e293b', fontSize: '0.95rem'}}>ALS Units</div>
+                  <div style={{fontSize: '0.8rem', color: '#64748b', marginTop: '2px'}}>Advanced Support</div>
+               </div>
+               <div style={{fontWeight: 700, fontSize: '1.1rem', color: '#1e293b'}}>2</div>
+            </div>
+
+            <div style={{display: 'flex', alignItems: 'center', gap: '12px'}}>
+               <div style={{background: 'rgba(244, 67, 54, 0.1)', padding: '12px', borderRadius: '12px'}}><AlertTriangle size={20} color="#f44336"/></div>
+               <div style={{flex: 1}}>
+                  <div style={{fontWeight: 600, color: '#1e293b', fontSize: '0.95rem'}}>Maintenance</div>
+                  <div style={{fontSize: '0.8rem', color: '#64748b', marginTop: '2px'}}>In Garage</div>
+               </div>
+               <div style={{fontWeight: 700, fontSize: '1.1rem', color: '#1e293b'}}>3</div>
+            </div>
+            
+         </div>
       </div>
     </div>
   );

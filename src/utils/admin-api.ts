@@ -17,43 +17,18 @@ export function getHeaders() {
   return {
     'Content-Type': 'application/json',
     'Authorization': `Bearer ${token}`,
-    'X-API-Key': 'fnw4ua8bdueu5vckkhg56jaq8xy9m8' // Correct backend API_KEY
+    'X-API-Key': import.meta.env.VITE_BACKEND_API_KEY
   };
 }
 
-export async function sendAdminOTP(mobile: string) {
-  const res = await fetch(`${BASE_URL}/admin/auth/login/mobile`, {
+export async function loginAdminPassword(username: string, password: string) {
+  const res = await fetch(`${BASE_URL}/admin/auth/login/password`, {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json', 'X-API-Key': 'fnw4ua8bdueu5vckkhg56jaq8xy9m8' },
-    body: JSON.stringify({ mobile })
+    headers: { 'Content-Type': 'application/json', 'X-API-Key': import.meta.env.VITE_BACKEND_API_KEY as string },
+    body: JSON.stringify({ username, password })
   });
   if (!res.ok) {
-    let errorDetail = 'Failed to send OTP';
-    try {
-      const error = await res.json();
-      errorDetail = error.detail || errorDetail;
-    } catch (e) {
-      // If it's not JSON, it might be a proxy or server crash
-      errorDetail = `Server error (${res.status})`;
-    }
-    throw new Error(errorDetail);
-  }
-  
-  try {
-    return await res.json();
-  } catch (e) {
-    throw new Error('Invalid response from server');
-  }
-}
-
-export async function verifyAdminOTP(mobile: string, otp: string) {
-  const res = await fetch(`${BASE_URL}/admin/auth/login/mobile/verify`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json', 'X-API-Key': 'fnw4ua8bdueu5vckkhg56jaq8xy9m8' },
-    body: JSON.stringify({ mobile, otp })
-  });
-  if (!res.ok) {
-    let errorDetail = 'Invalid OTP';
+    let errorDetail = 'Invalid username or password';
     try {
       const error = await res.json();
       errorDetail = error.detail || errorDetail;
@@ -196,7 +171,7 @@ export async function listHospitals() {
 
 export function createFleetWebSocket(onMessage: (data: any) => void, onError: (error: any) => void, onHealth?: (healthy: boolean) => void) {
   const token = localStorage.getItem('admin_token') || 'mock-admin-token-123';
-  const apiKey = 'fnw4ua8bdueu5vckkhg56jaq8xy9m8'; // Correct backend setup
+  const apiKey = import.meta.env.VITE_BACKEND_API_KEY; 
   const ws = new WebSocket(`${WS_URL}/admin/fleet/live?api_key=${apiKey}&token=${token}`);
   
   let pingInterval: ReturnType<typeof setInterval>;
@@ -256,11 +231,11 @@ export async function listCoAdmins() {
   return res.json();
 }
 
-export async function addCoAdmin(name: string, mobile: string, role: string) {
+export async function addCoAdmin(name: string, mobile: string, role: string, username: string, password: string) {
   const res = await fetch(`${BASE_URL}/admin/co_admins`, {
     method: 'POST',
     headers: getHeaders(),
-    body: JSON.stringify({ name, mobile, role })
+    body: JSON.stringify({ name, mobile, role, username, password })
   });
   if (!res.ok) {
     const errorData = await res.json().catch(() => null);

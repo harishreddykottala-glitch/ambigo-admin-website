@@ -146,7 +146,8 @@ export default function AdminVerifyDrivers() {
                       <td>{ambulanceTypes[d.vehicle_type] || d.vehicle_type || '-'} {d.vehicle_registration ? `- ${d.vehicle_registration}` : ''}</td>
                   <td>
                     <button 
-                      className="admin-btn-secondary"
+                      className="admin-btn processing"
+                      style={{padding: '4px 10px', fontSize: '0.75rem'}}
                       onClick={() => handleSelectDriver(d._id)}
                     >
                       Review

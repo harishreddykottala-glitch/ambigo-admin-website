@@ -40,7 +40,7 @@ export default function AdminUsers() {
             placeholder="Search by name or mobile..." 
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            style={{ padding: '8px 12px 8px 32px', borderRadius: '6px', border: '1px solid #e2e8f0', width: '250px', outline: 'none', fontSize: '14px' }}
+            style={{ padding: '8px 12px 8px 32px', borderRadius: '6px', border: '1px solid #e2e8f0', width: '250px', outline: 'none', fontSize: '14px', backgroundColor: '#ffffff', color: '#1e293b' }}
           />
           <Search size={16} style={{ position: 'absolute', left: '10px', top: '50%', transform: 'translateY(-50%)', color: '#94a3b8' }} />
         </div>

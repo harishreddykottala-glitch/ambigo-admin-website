@@ -14,7 +14,7 @@ interface CoAdmin {
 const AdminCoAdmins = () => {
   const [coAdmins, setCoAdmins] = useState<CoAdmin[]>([]);
   const [showForm, setShowForm] = useState(false);
-  const [newAdmin, setNewAdmin] = useState({ name: '', mobile: '', role: 'Viewer' });
+  const [newAdmin, setNewAdmin] = useState({ name: '', mobile: '', username: '', password: '', role: 'Operations Manager' });
 
 
   const fetchAdmins = async () => {
@@ -32,13 +32,13 @@ const AdminCoAdmins = () => {
 
   const handleAdd = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!newAdmin.name || !newAdmin.mobile || newAdmin.mobile.length !== 10) {
-      alert("Please provide a valid name and exactly 10-digit mobile number.");
+    if (!newAdmin.name || !newAdmin.username || !newAdmin.password) {
+      alert("Name, Username, and Password are required fields.");
       return;
     }
     try {
-      await addCoAdmin(newAdmin.name, newAdmin.mobile, newAdmin.role);
-      setNewAdmin({ name: '', mobile: '', role: 'Viewer' });
+      await addCoAdmin(newAdmin.name, newAdmin.mobile, newAdmin.role, newAdmin.username, newAdmin.password);
+      setNewAdmin({ name: '', mobile: '', username: '', password: '', role: 'Operations Manager' });
       setShowForm(false);
       fetchAdmins();
     } catch (e: any) {
@@ -69,26 +69,36 @@ const AdminCoAdmins = () => {
     <div className="admin-page fade-in">
       <div className="admin-page-header flex-between">
         <div>
-          <h1>Co-Admins</h1>
-          <p>Manage portal access and roles</p>
+          <h1>Staff Management</h1>
+          <p>Manage portal access, roles, and staff credentials</p>
         </div>
         <button className="admin-btn primary" onClick={() => setShowForm(!showForm)}>
-          + Add New
+          + Add Staff
         </button>
       </div>
 
       {showForm && (
         <div className="glass-panel mt-4 fade-in">
-          <h3>Add Co-Admin</h3>
-          <form className="admin-form-inline mt-2" onSubmit={handleAdd}>
-            <input type="text" placeholder="Name" value={newAdmin.name} onChange={e => setNewAdmin({...newAdmin, name: e.target.value})} required />
-            <input type="tel" placeholder="Mobile Number (10 digits)" value={newAdmin.mobile} onChange={e => setNewAdmin({...newAdmin, mobile: e.target.value.replace(/\D/g, '')})} maxLength={10} required />
-            <select value={newAdmin.role} onChange={e => setNewAdmin({...newAdmin, role: e.target.value})}>
-              <option>Viewer</option>
-              <option>Editor</option>
-              <option>Manager</option>
-            </select>
-            <button type="submit" className="admin-btn primary">Save</button>
+          <h3>Create Staff Account</h3>
+          <form className="admin-form-inline mt-2" onSubmit={handleAdd} style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
+            <div style={{ display: 'flex', gap: '10px' }}>
+              <input style={{ flex: 1 }} type="text" placeholder="Full Name" value={newAdmin.name} onChange={e => setNewAdmin({...newAdmin, name: e.target.value})} required />
+              <input style={{ flex: 1 }} type="tel" placeholder="Mobile Number (Optional)" value={newAdmin.mobile} onChange={e => setNewAdmin({...newAdmin, mobile: e.target.value.replace(/\D/g, '')})} maxLength={10} />
+            </div>
+            <div style={{ display: 'flex', gap: '10px' }}>
+              <input style={{ flex: 1 }} type="text" placeholder="Username (e.g. support.john)" value={newAdmin.username} onChange={e => setNewAdmin({...newAdmin, username: e.target.value})} required />
+              <input style={{ flex: 1 }} type="text" placeholder="Temporary Password" value={newAdmin.password} onChange={e => setNewAdmin({...newAdmin, password: e.target.value})} required />
+              <select style={{ flex: 1 }} value={newAdmin.role} onChange={e => setNewAdmin({...newAdmin, role: e.target.value})}>
+                <option>Founder / Co-founder</option>
+                <option>Operations Manager</option>
+                <option>HR Manager</option>
+                <option>Call Center Executive</option>
+                <option>Support Executive</option>
+                <option>Customer Executive</option>
+                <option>Verification Executive</option>
+              </select>
+            </div>
+            <button type="submit" className="admin-btn primary" style={{ alignSelf: 'flex-start' }}>Generate Credentials & Save</button>
           </form>
         </div>
       )}
@@ -119,7 +129,7 @@ const AdminCoAdmins = () => {
                   <button 
                     className="admin-btn-text" 
                     onClick={() => toggleStatus(a.id)}
-                    disabled={a.role === 'Super Admin'}
+                    disabled={a.role === 'Super Admin' || a.role === 'Founder / Co-founder'}
                   >
                     {a.active ? 'Disable' : 'Enable'}
                   </button>
@@ -127,7 +137,7 @@ const AdminCoAdmins = () => {
                     className="admin-btn-text" 
                     style={{ color: '#ef4444', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '4px' }}
                     onClick={() => handleDelete(a.id)}
-                    disabled={a.role === 'Super Admin'}
+                    disabled={a.role === 'Super Admin' || a.role === 'Founder / Co-founder'}
                     title="Remove Admin"
                   >
                     <Trash2 size={16} />

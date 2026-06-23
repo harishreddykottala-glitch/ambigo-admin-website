@@ -1,46 +1,37 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { sendAdminOTP, verifyAdminOTP } from '../../utils/admin-api';
+import { loginAdminPassword } from '../../utils/admin-api';
 import { useAppDispatch } from '../../store/hooks';
 import { loginSuccess } from '../../store/slices/authSlice';
 import '../../assets/admin.css';
 
 const AdminLogin = () => {
-  const [mobile, setMobile] = useState('');
-  const [otp, setOtp] = useState('');
-  const [step, setStep] = useState<1 | 2>(1);
+  const [username, setUsername] = useState('');
+  const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
 
-  const handleSendOTP = async (e: React.FormEvent) => {
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (mobile.length !== 10) {
-      setError('Mobile number must be 10 digits');
+    if (!username || !password) {
+      setError('Username and password are required');
       return;
     }
     setError('');
     setLoading(true);
     try {
-      await sendAdminOTP(mobile);
-      setStep(2);
-    } catch (err: any) {
-      setError(err.message || 'Failed to send OTP');
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleVerifyOTP = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setError('');
-    setLoading(true);
-    try {
-      const data = await verifyAdminOTP(mobile, otp);
+      const data = await loginAdminPassword(username, password);
       if (data.token) {
-        dispatch(loginSuccess(data.token));
-        navigate('/admin/dashboard');
+        const userRole = data.role || 'Viewer';
+        dispatch(loginSuccess({ token: data.token, role: userRole, username: data.username }));
+        
+        if (userRole === 'HR Manager') navigate('/admin/co-admins');
+        else if (userRole === 'Verification Executive') navigate('/admin/verify-drivers');
+        else if (userRole === 'Call Center Executive') navigate('/admin/map');
+        else if (userRole === 'Support Executive' || userRole === 'Customer Executive') navigate('/admin/bookings');
+        else navigate('/admin/dashboard');
       }
     } catch (err: any) {
       setError(err.message || 'Login failed');
@@ -84,69 +75,45 @@ const AdminLogin = () => {
         </div>
         <h2 style={{ fontSize: '1.75rem', fontWeight: 600, color: '#ffffff', margin: '0 0 10px', letterSpacing: '-0.5px' }}>Welcome Back</h2>
         <p className="login-subtitle" style={{ color: '#94a3b8', marginBottom: '35px', fontSize: '0.95rem', fontWeight: 400 }}>
-          {step === 1 ? 'Enter your registered mobile number' : 'Enter the OTP sent to your mobile'}
+          Enter your username and password
         </p>
         
         {error && <div className="admin-error-alert" style={{ marginBottom: '25px', backgroundColor: 'rgba(239, 68, 68, 0.15)', color: '#fca5a5', border: '1px solid rgba(239, 68, 68, 0.3)', borderRadius: '12px', padding: '12px', fontSize: '0.9rem' }}>{error}</div>}
 
-        {step === 1 ? (
-          <form onSubmit={handleSendOTP} className="admin-form" style={{ textAlign: 'left' }}>
-            <div className="form-group" style={{ marginBottom: '24px' }}>
-              <label style={{ color: '#cbd5e1', fontWeight: 600, fontSize: '0.8rem', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Mobile Number</label>
-              <input 
-                type="tel" 
-                value={mobile} 
-                onChange={e => setMobile(e.target.value.replace(/\D/g, ''))} 
-                placeholder="e.g. 9876543210"
-                maxLength={10}
-                required
-                style={{ padding: '14px 18px', fontSize: '1.05rem', borderRadius: '14px', border: '1px solid rgba(255, 255, 255, 0.1)', backgroundColor: 'rgba(255, 255, 255, 0.06)', color: '#fff', outline: 'none', width: '100%', boxSizing: 'border-box', marginTop: '10px', transition: 'all 0.3s ease', backdropFilter: 'blur(10px)' }}
-                onFocus={(e) => { e.target.style.border = '1px solid rgba(255, 107, 53, 0.5)'; e.target.style.backgroundColor = 'rgba(255, 255, 255, 0.1)'; }}
-                onBlur={(e) => { e.target.style.border = '1px solid rgba(255, 255, 255, 0.1)'; e.target.style.backgroundColor = 'rgba(255, 255, 255, 0.06)'; }}
-              />
-            </div>
-            <button type="submit" className="admin-btn primary full-width" disabled={loading} style={{ padding: '16px', borderRadius: '14px', fontSize: '1.05rem', fontWeight: 600, background: 'linear-gradient(135deg, #ff6b35 0%, #f97316 100%)', border: 'none', boxShadow: '0 8px 20px -6px rgba(255, 107, 53, 0.6)', transition: 'transform 0.2s', cursor: loading ? 'not-allowed' : 'pointer' }}
-              onMouseOver={(e) => { if (!loading) e.currentTarget.style.transform = 'translateY(-2px)' }}
-              onMouseOut={(e) => { if (!loading) e.currentTarget.style.transform = 'translateY(0)' }}
-            >
-              {loading ? 'Sending OTP...' : 'Get OTP'}
-            </button>
-          </form>
-        ) : (
-          <form onSubmit={handleVerifyOTP} className="admin-form" style={{ textAlign: 'left' }}>
-            <div className="form-group" style={{ marginBottom: '24px' }}>
-              <label style={{ color: '#cbd5e1', fontWeight: 600, fontSize: '0.8rem', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Enter OTP</label>
-              <input 
-                type="text" 
-                value={otp} 
-                onChange={e => setOtp(e.target.value.replace(/\D/g, ''))} 
-                placeholder="••••"
-                maxLength={6}
-                required
-                style={{ padding: '14px 18px', fontSize: '1.2rem', borderRadius: '14px', border: '1px solid rgba(255, 255, 255, 0.1)', backgroundColor: 'rgba(255, 255, 255, 0.06)', color: '#fff', outline: 'none', width: '100%', boxSizing: 'border-box', marginTop: '10px', letterSpacing: '8px', textAlign: 'center', transition: 'all 0.3s ease', backdropFilter: 'blur(10px)' }}
-                onFocus={(e) => { e.target.style.border = '1px solid rgba(255, 107, 53, 0.5)'; e.target.style.backgroundColor = 'rgba(255, 255, 255, 0.1)'; }}
-                onBlur={(e) => { e.target.style.border = '1px solid rgba(255, 255, 255, 0.1)'; e.target.style.backgroundColor = 'rgba(255, 255, 255, 0.06)'; }}
-              />
-            </div>
-            <button type="submit" className="admin-btn primary full-width" disabled={loading} style={{ padding: '16px', borderRadius: '14px', fontSize: '1.05rem', fontWeight: 600, background: 'linear-gradient(135deg, #ff6b35 0%, #f97316 100%)', border: 'none', boxShadow: '0 8px 20px -6px rgba(255, 107, 53, 0.6)', transition: 'transform 0.2s', cursor: loading ? 'not-allowed' : 'pointer' }}
-              onMouseOver={(e) => { if (!loading) e.currentTarget.style.transform = 'translateY(-2px)' }}
-              onMouseOut={(e) => { if (!loading) e.currentTarget.style.transform = 'translateY(0)' }}
-            >
-              {loading ? 'Verifying...' : 'Login'}
-            </button>
-            <button 
-              type="button" 
-              className="admin-btn secondary full-width" 
-              style={{marginTop: '16px', padding: '14px', borderRadius: '14px', fontSize: '0.95rem', fontWeight: 500, background: 'transparent', border: '1px solid rgba(255,255,255,0.1)', color: '#cbd5e1', cursor: 'pointer', transition: 'all 0.2s ease' }} 
-              onClick={() => { setStep(1); setOtp(''); setError(''); }}
-              onMouseOver={(e) => { if (!loading) { e.currentTarget.style.backgroundColor = 'rgba(255,255,255,0.05)'; e.currentTarget.style.color = '#fff' } }}
-              onMouseOut={(e) => { if (!loading) { e.currentTarget.style.backgroundColor = 'transparent'; e.currentTarget.style.color = '#cbd5e1' } }}
-              disabled={loading}
-            >
-              Back to Mobile Entry
-            </button>
-          </form>
-        )}
+        <form onSubmit={handleLogin} className="admin-form" style={{ textAlign: 'left' }}>
+          <div className="form-group" style={{ marginBottom: '20px' }}>
+            <label style={{ color: '#cbd5e1', fontWeight: 600, fontSize: '0.8rem', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Username</label>
+            <input 
+              type="text" 
+              value={username} 
+              onChange={e => setUsername(e.target.value)} 
+              placeholder="e.g. support.john"
+              required
+              style={{ padding: '14px 18px', fontSize: '1.05rem', borderRadius: '14px', border: '1px solid rgba(255, 255, 255, 0.1)', backgroundColor: 'rgba(255, 255, 255, 0.06)', color: '#fff', outline: 'none', width: '100%', boxSizing: 'border-box', marginTop: '10px', transition: 'all 0.3s ease', backdropFilter: 'blur(10px)' }}
+              onFocus={(e) => { e.target.style.border = '1px solid rgba(255, 107, 53, 0.5)'; e.target.style.backgroundColor = 'rgba(255, 255, 255, 0.1)'; }}
+              onBlur={(e) => { e.target.style.border = '1px solid rgba(255, 255, 255, 0.1)'; e.target.style.backgroundColor = 'rgba(255, 255, 255, 0.06)'; }}
+            />
+          </div>
+          <div className="form-group" style={{ marginBottom: '30px' }}>
+            <label style={{ color: '#cbd5e1', fontWeight: 600, fontSize: '0.8rem', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Password</label>
+            <input 
+              type="password" 
+              value={password} 
+              onChange={e => setPassword(e.target.value)} 
+              placeholder="••••••••"
+              required
+              style={{ padding: '14px 18px', fontSize: '1.05rem', borderRadius: '14px', border: '1px solid rgba(255, 255, 255, 0.1)', backgroundColor: 'rgba(255, 255, 255, 0.06)', color: '#fff', outline: 'none', width: '100%', boxSizing: 'border-box', marginTop: '10px', transition: 'all 0.3s ease', backdropFilter: 'blur(10px)' }}
+              onFocus={(e) => { e.target.style.border = '1px solid rgba(255, 107, 53, 0.5)'; e.target.style.backgroundColor = 'rgba(255, 255, 255, 0.1)'; }}
+              onBlur={(e) => { e.target.style.border = '1px solid rgba(255, 255, 255, 0.1)'; e.target.style.backgroundColor = 'rgba(255, 255, 255, 0.06)'; }}
+            />
+          </div>
+          <button type="submit" className="admin-btn primary full-width" disabled={loading} style={{ padding: '16px', borderRadius: '14px', fontSize: '1.05rem', fontWeight: 600, background: 'linear-gradient(135deg, #ff6b35 0%, #f97316 100%)', border: 'none', boxShadow: '0 8px 20px -6px rgba(255, 107, 53, 0.6)', transition: 'transform 0.2s', cursor: loading ? 'not-allowed' : 'pointer' }}
+            onMouseOver={(e) => { if (!loading) e.currentTarget.style.transform = 'translateY(-2px)' }}
+            onMouseOut={(e) => { if (!loading) e.currentTarget.style.transform = 'translateY(0)' }}
+          >
+            {loading ? 'Logging in...' : 'Login'}
+          </button>
+        </form>
       </div>
     </div>
   );
