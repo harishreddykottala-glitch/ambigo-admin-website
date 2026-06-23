@@ -1,5 +1,20 @@
-const BASE_URL = import.meta.env.VITE_API_URL || '/api';
-const WS_URL = import.meta.env.VITE_WS_URL || (import.meta.env.DEV ? `ws://${window.location.host}/ws` : 'wss://ambigo.in/ws');
+const DEFAULT_API_URL = 'https://ambigo.in/api';
+const configuredApiUrl = import.meta.env.VITE_API_URL?.trim();
+const configuredWsUrl = import.meta.env.VITE_WS_URL?.trim();
+
+const BASE_URL =
+  configuredApiUrl && (import.meta.env.DEV || /^https?:\/\//.test(configuredApiUrl))
+    ? configuredApiUrl.replace(/\/$/, '')
+    : import.meta.env.DEV
+      ? '/api'
+      : DEFAULT_API_URL;
+
+const WS_URL =
+  configuredWsUrl && (import.meta.env.DEV || /^wss?:\/\//.test(configuredWsUrl))
+    ? configuredWsUrl.replace(/\/$/, '')
+    : import.meta.env.DEV
+      ? `ws://${window.location.host}/ws`
+      : 'wss://ambigo.in/ws';
 export const LIVE_MEDIA_URL = import.meta.env.VITE_MEDIA_URL || 'https://ambigo.in';
 
 export function getMediaUrl(url: string | undefined | null) {
