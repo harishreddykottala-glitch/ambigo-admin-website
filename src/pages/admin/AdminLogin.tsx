@@ -16,12 +16,9 @@ const AdminLogin = () => {
   const userRole = useAppSelector(state => state.auth.role) || 'Viewer';
 
   useEffect(() => {
+    // Temporarily disabled redirect to track down refresh bug
     if (isAuthenticated) {
-      if (userRole === 'HR Manager') navigate('/admin/co-admins');
-      else if (userRole === 'Verification Executive') navigate('/admin/verify-drivers');
-      else if (userRole === 'Call Center Executive') navigate('/admin/map');
-      else if (userRole === 'Support Executive' || userRole === 'Customer Executive') navigate('/admin/bookings');
-      else navigate('/admin/dashboard');
+      console.log("AdminLogin mounted but user is authenticated. Original redirect disabled.");
     }
   }, [isAuthenticated, navigate, userRole]);
 
