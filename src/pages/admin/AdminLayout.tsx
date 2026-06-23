@@ -13,27 +13,27 @@ const AdminLayout = () => {
   const username = useAppSelector(state => state.auth.username) || 'Admin';
 
   const hasAccess = (path: string) => {
-    const normalizedRole = role?.trim();
-    const normalizedPath = path.replace(/\/$/, '');
+    const normalizedRole = role?.trim().toLowerCase() || '';
+    const normalizedPath = path.replace(/\/$/, '').toLowerCase();
 
-    if (normalizedRole === 'Founder / Co-founder' || normalizedRole === 'Super Admin') return true;
+    if (normalizedRole === 'founder / co-founder' || normalizedRole === 'super admin' || normalizedRole === 'superadmin') return true;
     
-    if (normalizedRole === 'Operations Manager') {
+    if (normalizedRole === 'operations manager') {
       return ['/admin/dashboard', '/admin/map', '/admin/fleet', '/admin/hospitals', '/admin/bookings'].includes(normalizedPath);
     }
-    if (normalizedRole === 'HR Manager') {
+    if (normalizedRole === 'hr manager') {
       return ['/admin/co-admins'].includes(normalizedPath);
     }
-    if (normalizedRole === 'Call Center Executive') {
+    if (normalizedRole === 'call center executive') {
       return ['/admin/map', '/admin/bookings'].includes(normalizedPath);
     }
-    if (normalizedRole === 'Support Executive') {
+    if (normalizedRole === 'support executive') {
       return ['/admin/bookings', '/admin/fleet', '/admin/users'].includes(normalizedPath);
     }
-    if (normalizedRole === 'Customer Executive') {
+    if (normalizedRole === 'customer executive') {
       return ['/admin/users', '/admin/bookings'].includes(normalizedPath);
     }
-    if (normalizedRole === 'Verification Executive') {
+    if (normalizedRole === 'verification executive') {
       return ['/admin/verify-drivers'].includes(normalizedPath);
     }
     return false;

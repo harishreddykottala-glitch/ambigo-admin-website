@@ -44,7 +44,7 @@ function App() {
           <Route path="co-admins" element={<AdminCoAdmins />} />
         </Route>
 
-        <Route path="*" element={<Navigate to="/admin/login" replace />} />
+        <Route path="*" element={<div style={{padding: 50, textAlign: 'center'}}><h2>404 Not Found</h2><p>React Router failed to match this path.</p></div>} />
       </Routes>
     </>
   )
