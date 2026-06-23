@@ -17,14 +17,14 @@ export function getHeaders() {
   return {
     'Content-Type': 'application/json',
     'Authorization': `Bearer ${token}`,
-    'X-API-Key': 'fnw4ua8bdueu5vckkhg56jaq8xy9m8' // Correct backend API_KEY
+    'X-API-Key': import.meta.env.VITE_BACKEND_API_KEY
   };
 }
 
 export async function loginAdminPassword(username: string, password: string) {
   const res = await fetch(`${BASE_URL}/admin/auth/login/password`, {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json', 'X-API-Key': 'fnw4ua8bdueu5vckkhg56jaq8xy9m8' },
+    headers: { 'Content-Type': 'application/json', 'X-API-Key': import.meta.env.VITE_BACKEND_API_KEY as string },
     body: JSON.stringify({ username, password })
   });
   if (!res.ok) {
@@ -171,7 +171,7 @@ export async function listHospitals() {
 
 export function createFleetWebSocket(onMessage: (data: any) => void, onError: (error: any) => void, onHealth?: (healthy: boolean) => void) {
   const token = localStorage.getItem('admin_token') || 'mock-admin-token-123';
-  const apiKey = 'fnw4ua8bdueu5vckkhg56jaq8xy9m8'; // Correct backend setup
+  const apiKey = import.meta.env.VITE_BACKEND_API_KEY; 
   const ws = new WebSocket(`${WS_URL}/admin/fleet/live?api_key=${apiKey}&token=${token}`);
   
   let pingInterval: ReturnType<typeof setInterval>;
