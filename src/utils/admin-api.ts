@@ -1,6 +1,18 @@
+import { store } from '../store/store';
+import { logout } from '../store/slices/authSlice';
+
 const DEFAULT_API_URL = 'https://ambigo.in/api';
 const configuredApiUrl = import.meta.env.VITE_API_URL?.trim();
 const configuredWsUrl = import.meta.env.VITE_WS_URL?.trim();
+
+async function fetchWithAuth(url: string, options: RequestInit = {}) {
+  const res = await fetch(url, options);
+  if (res.status === 401) {
+    store.dispatch(logout());
+    throw new Error('Session expired. Please log in again.');
+  }
+  return res;
+}
 
 const BASE_URL =
   configuredApiUrl && (import.meta.env.DEV || /^https?:\/\//.test(configuredApiUrl))
@@ -37,7 +49,7 @@ export function getHeaders() {
 }
 
 export async function loginAdminPassword(username: string, password: string) {
-  const res = await fetch(`${BASE_URL}/admin/auth/login/password`, {
+  const res = await fetchWithAuth(`${BASE_URL}/admin/auth/login/password`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json', 'X-API-Key': import.meta.env.VITE_BACKEND_API_KEY as string },
     body: JSON.stringify({ username, password })
@@ -61,7 +73,7 @@ export async function loginAdminPassword(username: string, password: string) {
 }
 
 export async function listOngoingRides() {
-  const res = await fetch(`${BASE_URL}/admin/rides/ongoing/list`, {
+  const res = await fetchWithAuth(`${BASE_URL}/admin/rides/ongoing/list`, {
     method: 'POST',
     headers: getHeaders(),
   });
@@ -70,7 +82,7 @@ export async function listOngoingRides() {
 }
 
 export async function listCompletedRides() {
-  const res = await fetch(`${BASE_URL}/admin/rides/completed/list`, {
+  const res = await fetchWithAuth(`${BASE_URL}/admin/rides/completed/list`, {
     method: 'POST',
     headers: getHeaders(),
   });
@@ -79,7 +91,7 @@ export async function listCompletedRides() {
 }
 
 export async function fetchDashboardStats() {
-  const res = await fetch(`${BASE_URL}/admin/dashboard/stats`, {
+  const res = await fetchWithAuth(`${BASE_URL}/admin/dashboard/stats`, {
     method: 'GET',
     headers: getHeaders(),
   });
@@ -88,7 +100,7 @@ export async function fetchDashboardStats() {
 }
 
 export async function listDrivers(skip: number = 0) {
-  const res = await fetch(`${BASE_URL}/admin/driver/list`, {
+  const res = await fetchWithAuth(`${BASE_URL}/admin/driver/list`, {
     method: 'POST',
     headers: getHeaders(),
     body: JSON.stringify({ skip })
@@ -98,7 +110,7 @@ export async function listDrivers(skip: number = 0) {
 }
 
 export async function listAllDrivers() {
-  const res = await fetch(`${BASE_URL}/admin/driver/list/all`, {
+  const res = await fetchWithAuth(`${BASE_URL}/admin/driver/list/all`, {
     method: 'POST',
     headers: getHeaders()
   });
@@ -107,7 +119,7 @@ export async function listAllDrivers() {
 }
 
 export async function listUnverifiedDrivers() {
-  const res = await fetch(`${BASE_URL}/admin/driver/unverified/list`, {
+  const res = await fetchWithAuth(`${BASE_URL}/admin/driver/unverified/list`, {
     method: 'POST',
     headers: getHeaders(),
   });
@@ -116,7 +128,7 @@ export async function listUnverifiedDrivers() {
 }
 
 export async function fetchUnverifiedDriver(id: string) {
-  const res = await fetch(`${BASE_URL}/admin/driver/unverified/fetch`, {
+  const res = await fetchWithAuth(`${BASE_URL}/admin/driver/unverified/fetch`, {
     method: 'POST',
     headers: getHeaders(),
     body: JSON.stringify({ id })
@@ -126,7 +138,7 @@ export async function fetchUnverifiedDriver(id: string) {
 }
 
 export async function fetchDriverDetails(id: string) {
-  const res = await fetch(`${BASE_URL}/admin/driver/details`, {
+  const res = await fetchWithAuth(`${BASE_URL}/admin/driver/details`, {
     method: 'POST',
     headers: getHeaders(),
     body: JSON.stringify({ id })
@@ -136,7 +148,7 @@ export async function fetchDriverDetails(id: string) {
 }
 
 export async function acceptDriver(driverData: any) {
-  const res = await fetch(`${BASE_URL}/admin/driver/unverified/accept`, {
+  const res = await fetchWithAuth(`${BASE_URL}/admin/driver/unverified/accept`, {
     method: 'POST',
     headers: getHeaders(),
     body: JSON.stringify(driverData)
@@ -146,7 +158,7 @@ export async function acceptDriver(driverData: any) {
 }
 
 export async function rejectDriver(id: string, reason: string) {
-  const res = await fetch(`${BASE_URL}/admin/driver/unverified/reject`, {
+  const res = await fetchWithAuth(`${BASE_URL}/admin/driver/unverified/reject`, {
     method: 'POST',
     headers: getHeaders(),
     body: JSON.stringify({ id, reason })
@@ -158,7 +170,7 @@ export async function rejectDriver(id: string, reason: string) {
 
 
 export async function listUsers() {
-  const res = await fetch(`${BASE_URL}/admin/user/list`, {
+  const res = await fetchWithAuth(`${BASE_URL}/admin/user/list`, {
     method: 'POST',
     headers: getHeaders(),
   });
@@ -167,7 +179,7 @@ export async function listUsers() {
 }
 
 export async function listAmbulanceTypes() {
-  const res = await fetch(`${BASE_URL}/data/ambulance/types/list`, {
+  const res = await fetchWithAuth(`${BASE_URL}/data/ambulance/types/list`, {
     method: 'POST',
     headers: getHeaders(),
   });
@@ -176,7 +188,7 @@ export async function listAmbulanceTypes() {
 }
 
 export async function listHospitals() {
-  const res = await fetch(`${BASE_URL}/data/hospitals/list`, {
+  const res = await fetchWithAuth(`${BASE_URL}/data/hospitals/list`, {
     method: 'POST',
     headers: getHeaders(),
   });
@@ -236,7 +248,7 @@ export function createFleetWebSocket(onMessage: (data: any) => void, onError: (e
 }
 
 export async function listCoAdmins() {
-  const res = await fetch(`${BASE_URL}/admin/co_admins`, {
+  const res = await fetchWithAuth(`${BASE_URL}/admin/co_admins`, {
     headers: getHeaders()
   });
   if (!res.ok) {
@@ -247,7 +259,7 @@ export async function listCoAdmins() {
 }
 
 export async function addCoAdmin(name: string, mobile: string, role: string, username: string, password: string) {
-  const res = await fetch(`${BASE_URL}/admin/co_admins`, {
+  const res = await fetchWithAuth(`${BASE_URL}/admin/co_admins`, {
     method: 'POST',
     headers: getHeaders(),
     body: JSON.stringify({ name, mobile, role, username, password })
@@ -260,7 +272,7 @@ export async function addCoAdmin(name: string, mobile: string, role: string, use
 }
 
 export async function toggleCoAdmin(id: string) {
-  const res = await fetch(`${BASE_URL}/admin/co_admins/${id}/toggle`, {
+  const res = await fetchWithAuth(`${BASE_URL}/admin/co_admins/${id}/toggle`, {
     method: 'PUT',
     headers: getHeaders()
   });
@@ -272,7 +284,7 @@ export async function toggleCoAdmin(id: string) {
 }
 
 export async function deleteCoAdmin(id: string) {
-  const res = await fetch(`${BASE_URL}/admin/co_admins/${id}`, {
+  const res = await fetchWithAuth(`${BASE_URL}/admin/co_admins/${id}`, {
     method: 'DELETE',
     headers: getHeaders()
   });
