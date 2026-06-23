@@ -1,7 +1,7 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { loginAdminPassword } from '../../utils/admin-api';
-import { useAppDispatch } from '../../store/hooks';
+import { useAppDispatch, useAppSelector } from '../../store/hooks';
 import { loginSuccess } from '../../store/slices/authSlice';
 import '../../assets/admin.css';
 
@@ -12,6 +12,18 @@ const AdminLogin = () => {
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
+  const isAuthenticated = useAppSelector(state => state.auth.isAuthenticated);
+  const userRole = useAppSelector(state => state.auth.role) || 'Viewer';
+
+  useEffect(() => {
+    if (isAuthenticated) {
+      if (userRole === 'HR Manager') navigate('/admin/co-admins');
+      else if (userRole === 'Verification Executive') navigate('/admin/verify-drivers');
+      else if (userRole === 'Call Center Executive') navigate('/admin/map');
+      else if (userRole === 'Support Executive' || userRole === 'Customer Executive') navigate('/admin/bookings');
+      else navigate('/admin/dashboard');
+    }
+  }, [isAuthenticated, navigate, userRole]);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
