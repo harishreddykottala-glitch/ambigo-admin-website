@@ -1,5 +1,5 @@
 import { Outlet, NavLink, useNavigate, useLocation, Navigate } from 'react-router-dom';
-import { Home, Map, Activity, Users, ShieldCheck, Users2, Settings, Building2, Search, Bell, Mail, ArrowLeft, Send } from 'lucide-react';
+import { Home, Map, Activity, Users, ShieldCheck, Users2, Settings, Building2 } from 'lucide-react';
 import { useAppDispatch, useAppSelector } from '../../store/hooks';
 import { logout } from '../../store/slices/authSlice';
 import '../../assets/admin.css';
@@ -51,19 +51,6 @@ const AdminLayout = () => {
     if (role === 'Support Executive' || role === 'Customer Executive') return <Navigate to="/admin/bookings" replace />;
     return <Navigate to="/admin/dashboard" replace />;
   }
-
-  const getBreadcrumbName = () => {
-    const path = location.pathname;
-    if (path.includes('dashboard')) return 'System Reports / Dashboard Overview';
-    if (path.includes('map')) return 'Live Monitor / Live Fleet Map';
-    if (path.includes('bookings')) return 'Operations / Live Bookings';
-    if (path.includes('fleet')) return 'Operations / Fleet Control';
-    if (path.includes('verify-drivers')) return 'Operations / Verify Drivers';
-    if (path.includes('users')) return 'Operations / Registered Riders';
-    if (path.includes('hospitals')) return 'Operations / Partner Hospitals';
-    if (path.includes('co-admins')) return 'Settings / Staff Management';
-    return 'Dashboard';
-  };
 
   return (
     <div className="admin-layout-sidebar-wrapper">

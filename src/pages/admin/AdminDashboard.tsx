@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { fetchDashboardStats } from '../../utils/admin-api';
 import { useAppSelector } from '../../store/hooks';
-import { Activity, CarFront, Zap, AlertTriangle, ArrowUpRight, ArrowDownRight } from 'lucide-react';
+import { Activity, CarFront, AlertTriangle, ArrowUpRight, ArrowDownRight } from 'lucide-react';
 import AdminRealMap from './AdminRealMap';
 import '../../assets/admin.css';
 
