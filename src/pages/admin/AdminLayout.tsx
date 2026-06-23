@@ -49,10 +49,11 @@ const AdminLayout = () => {
   }
 
   if (location.pathname !== '/admin' && !hasAccess(location.pathname)) {
-    if (normalizedRole === 'hr manager') return <Navigate to="/admin/co-admins" replace />;
-    if (normalizedRole === 'verification executive') return <Navigate to="/admin/verify-drivers" replace />;
-    if (normalizedRole === 'call center executive') return <Navigate to="/admin/map" replace />;
-    if (normalizedRole === 'support executive' || normalizedRole === 'customer executive') return <Navigate to="/admin/bookings" replace />;
+    const currentRole = role?.trim().toLowerCase() || '';
+    if (currentRole === 'hr manager') return <Navigate to="/admin/co-admins" replace />;
+    if (currentRole === 'verification executive') return <Navigate to="/admin/verify-drivers" replace />;
+    if (currentRole === 'call center executive') return <Navigate to="/admin/map" replace />;
+    if (currentRole === 'support executive' || currentRole === 'customer executive') return <Navigate to="/admin/bookings" replace />;
     return <Navigate to="/admin/dashboard" replace />;
   }
 
