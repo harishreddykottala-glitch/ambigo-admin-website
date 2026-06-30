@@ -210,6 +210,14 @@ const AdminLiveBookings = () => {
                   <p style={{ fontSize: '0.8rem', color: '#64748b', margin: '0 0 4px', textTransform: 'uppercase', fontWeight: 600 }}>Payment</p>
                   <p style={{ margin: 0, fontWeight: 600, fontSize: '1.1rem', color: '#10b981', textTransform: 'uppercase' }}>{selectedRide.payment_mode || 'N/A'}</p>
                 </div>
+                <div style={{ background: '#f8fafc', padding: '12px 16px', borderRadius: '8px', border: '1px solid #e2e8f0', borderLeft: '3px solid #3b82f6' }}>
+                  <p style={{ fontSize: '0.8rem', color: '#64748b', margin: '0 0 4px', textTransform: 'uppercase', fontWeight: 600 }}>User Phone</p>
+                  <p style={{ margin: 0, fontWeight: 600, fontSize: '1.1rem', color: '#0f172a' }}>{selectedRide.user_phone || 'N/A'}</p>
+                </div>
+                <div style={{ background: '#f8fafc', padding: '12px 16px', borderRadius: '8px', border: '1px solid #e2e8f0', borderLeft: '3px solid #eab308' }}>
+                  <p style={{ fontSize: '0.8rem', color: '#64748b', margin: '0 0 4px', textTransform: 'uppercase', fontWeight: 600 }}>Ambulance Type</p>
+                  <p style={{ margin: 0, fontWeight: 600, fontSize: '1.1rem', color: '#0f172a', textTransform: 'uppercase' }}>{selectedRide.amb_type_name || selectedRide.amb_type_id || 'N/A'}</p>
+                </div>
               </div>
 
               <h5 style={{ margin: '0 0 12px', color: '#1e293b', fontSize: '1rem', borderBottom: '2px solid #f1f5f9', paddingBottom: '8px', display: 'flex', alignItems: 'center', gap: '6px' }}>
